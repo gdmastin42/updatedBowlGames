@@ -1,0 +1,20 @@
+.game-card {
+    transition: all 0.3s ease;
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.playoff-game {
+    border-left: 4px solid #ffc107;
+}
+
+.semifinal-game {
+    border-left: 4px solid #fd7e14;
+}
+
+.championship-game {
+    border-left: 4px solid #dc3545;
+}

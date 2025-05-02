@@ -18,3 +18,15 @@
 .championship-game {
     border-left: 4px solid #dc3545;
 }
+
+.form-check-input {
+    border: 2px solid black; /* Add a black outline */
+    width: 20px; /* Adjust size for better visibility */
+    height: 20px; /* Adjust size for better visibility */
+    margin-top: 0.3rem; /* Align with labels */
+}
+
+.form-check-input:checked {
+    background-color: #0d6efd; /* Optional: Add a blue fill when selected */
+    border-color: #0d6efd; /* Optional: Change border color when selected */
+}

@@ -5,32 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>2024-25 Bowl Season Predictions</title>
   <!-- bootstrap -->
-  <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">  
+  <link rel="stylesheet" href="/lib/css/bootstrap.min.css">
   <!-- custom css -->
-  <link href="/css/styles.css" rel="stylesheet" >
+  <link href="/css/styles.css" rel="stylesheet">
 </head>
 <body class="bg-dark">
-  <!-- Login Form -->
+  <!-- Predictions Form -->
   <div class="container py-5">
-    <div id="divLogin" class="card p-4 rounded-4 bg-light mx-auto" style="max-width: 500px;">
-      <h3 class="text-center mb-4">2024-25 Bowl Season Predictions</h3>
-      <form id="frmLogin">
-        <div class="mb-3">
-          <label for="txtFirstName" class="form-label">First Name</label>
-          <input type="text" id="txtFirstName" class="form-control" placeholder="John" required>
-        </div>
-
-        <div class="mb-3">
-          <label for="txtLastName" class="form-label">Last Name</label>
-          <input type="text" id="txtLastName" class="form-control" placeholder="Doe" required>
-        </div>
-
-        <button id="btnLogin" type="submit" class="btn btn-primary w-100 mt-3">Start Predictions</button>
-      </form>
-    </div>
-
-    <!-- Predictions Form -->
-    <div id="divPredictionContainer" class="d-none">
+    <div id="divPredictionContainer">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-white">2024-25 Bowl Season Predictions</h2>
         <div>
@@ -72,12 +54,12 @@
       </form>
     </div>
   </div>
-
   <!-- Load Bootstrap JS -->
-  <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>  
+  <script src="/lib/js/bootstrap.bundle.min.js"></script>
   <!-- sweet alerts -->
-  <script src="../node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+  <script src="/lib/js/sweetalert2@11.js"></script>
   <!-- Load our custom JavaScript file -->
   <script src="/js/index.js"></script>
+
 </body>
 </html>

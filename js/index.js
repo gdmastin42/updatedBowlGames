@@ -57,98 +57,159 @@ const bowlGames = [
     { id: 46, name: "National Championship", team1: "Rose Bowl Winner", team2: "Cotton Bowl Winner", type: "championship" }
 ]
 
+require('dotenv').config();
+
+const BASE_URL = 'http://localhost:8000';
+const CFB_API_KEY = process.env.CFB_API_KEY;
+
+document.addEventListener('DOMContentLoaded', async function() {
+    generateBowlGameCards();
+
+    document.getElementById('btnLeaderboard')?.addEventListener('click', () => {
+        window.location.href = 'leaderboard.html';
+    });
+
+    document.getElementById('btnGameResults')?.addEventListener('click', () => {
+        window.location.href = 'gameResults.html';
+    });
+});
+
+// Function to fetch team logos
+async function fetchTeamLogos() {
+    const response = await fetch("https://apinext.collegefootballdata.com/teams/fbs", {
+        headers: {
+            "Authorization": `Bearer ${CFB_API_KEY}`
+        }
+    });
+
+    if (!response.ok) {
+        console.error("Failed to fetch team logos:", response.statusText);
+        return {};
+    }
+
+    const teams = await response.json();
+    const teamLogos = {};
+    teams.forEach(team => {
+        teamLogos[team.school] = team.logos[0];
+    });
+
+    return teamLogos;
+}
+
 // Function to generate all bowl game cards
-function generateBowlGameCards() {
-    const container = document.getElementById('divBowlGameContainer')
+async function generateBowlGameCards() {
+    const container = document.getElementById('divBowlGameContainer');
+    const teamLogos = await fetchTeamLogos();
 
     bowlGames.forEach(game => {
-        // Create the game card
-        const gameCard = document.createElement('div')
-        gameCard.className = 'col-md-6 col-lg-4 mb-3'
-        
-        // Determine card class based on game type
-        let cardClass = 'card game-card h-100'
+        const gameCard = document.createElement('div');
+        gameCard.className = 'col-md-6 col-lg-4 mb-3';
+
+        let cardClass = 'card game-card h-100';
         if (game.type === 'playoff') {
-        cardClass += ' playoff-game'
+            cardClass += ' playoff-game';
         } else if (game.type === 'semifinal') {
-        cardClass += ' semifinal-game'
+            cardClass += ' semifinal-game';
         } else if (game.type === 'championship') {
-        cardClass += ' championship-game'
+            cardClass += ' championship-game';
         }
-        
-        // Set the HTML content for the card
+
+        const team1Logo = teamLogos[game.team1] || '';
+        const team2Logo = teamLogos[game.team2] || '';
+
         gameCard.innerHTML = `
         <div class="${cardClass}">
             <div class="card-header">${game.name}</div>
             <div class="card-body">
-            <div class="mb-3">
-                <div class="form-check">
-                <input class="form-check-input" type="radio" name="game${game.id}" id="game${game.id}-team1" value="${game.team1}" required>
-                <label class="form-check-label" for="game${game.id}-team1">${game.team1}</label>
-                </div>
-                <div class="form-check">
-                <input class="form-check-input" type="radio" name="game${game.id}" id="game${game.id}-team2" value="${game.team2}">
-                <label class="form-check-label" for="game${game.id}-team2">${game.team2}</label>
+                <div class="mb-3">
+                    <div class="form-check d-flex align-items-center">
+                        <input class="form-check-input me-2" type="radio" name="game${game.id}" id="game${game.id}-team1" value="${game.team1}" required>
+                        <label class="form-check-label d-flex align-items-center" for="game${game.id}-team1">
+                            ${team1Logo ? `<img src="${team1Logo}" alt="${game.team1} logo" class="me-2" style="width: 24px; height: 24px;">` : ''}
+                            ${game.team1}
+                        </label>
+                    </div>
+                    <div class="form-check d-flex align-items-center">
+                        <input class="form-check-input me-2" type="radio" name="game${game.id}" id="game${game.id}-team2" value="${game.team2}">
+                        <label class="form-check-label d-flex align-items-center" for="game${game.id}-team2">
+                            ${team2Logo ? `<img src="${team2Logo}" alt="${game.team2} logo" class="me-2" style="width: 24px; height: 24px;">` : ''}
+                            ${game.team2}
+                        </label>
+                    </div>
                 </div>
             </div>
-            </div>
-        </div>
-        `
-        
-        // Add the card to the container
-        container.appendChild(gameCard)
-    })
+        </div>`;
+
+        container.appendChild(gameCard);
+    });
 }
 
-// Event handlers for login form submission
-function handleLogin(event) {
-    event.preventDefault()
+// Handle login form submission
+document.getElementById('frmLogin')?.addEventListener('submit', (event) => {
+    event.preventDefault();
 
-    // Get user info
-    const firstName = document.getElementById('txtFirstName').value
-    const lastName = document.getElementById('txtLastName').value
+    const firstName = document.getElementById('txtFirstName').value.trim();
+    const lastName = document.getElementById('txtLastName').value.trim();
 
-    // Update user display
-    document.getElementById('txtUsername').textContent = `${firstName} ${lastName}`
-
-    // Hide login, show predictions
-    document.getElementById('divLogin').classList.add('d-none')
-    document.getElementById('divPredictionContainer').classList.remove('d-none')
-
-    // Scroll to top
-    window.scrollTo(0, 0)
-}
-// Event handlers for predictions form submissions
-function handleSubmitPredictions(event) {
-    event.preventDefault()
-
-    // Collect all predictions using FormData function 
-    const formData = new FormData(this)
-    const predictions = {}
-
-    for (const [key, value] of formData.entries()) {
-        predictions[key] = value
+    if (!firstName || !lastName) {
+        Swal.fire('Error', 'First name and last name are required.', 'error');
+        return;
     }
 
-    // todo: submit predictions to server
-    console.log('Predictions submitted:', predictions)
+    const username = `${firstName.toLowerCase()}_${lastName.toLowerCase()}`;
 
-    // Show confirmation
-    Swal.fire({
-        position: "center",
-        icon: "success",
-        title: "Your Picks Have Been Submitted Successfully!",
-        showConfirmButton: false,
-        timer: 1500
+    fetch(`${BASE_URL}/api/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName, lastName }),
     })
-}
+    .then((response) => response.json())
+    .then((data) => {
+        if (data.error) {
+            Swal.fire('Error', data.error, 'error');
+        } else {
+            localStorage.setItem('username', username);
+            document.getElementById('divLogin').classList.add('d-none');
+            document.getElementById('divPredictionContainer').classList.remove('d-none');
+            document.getElementById('txtUsername').textContent = username;
+        }
+    })
+    .catch((err) => {
+        console.error('Error during login:', err);
+        Swal.fire('Error', 'An unexpected error occurred.', 'error');
+    });
+});
 
-    // Initialize the application when the DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-    // Generate all bowl game cards when the page loads
-    generateBowlGameCards()
+// Handle predictions form submission
+document.getElementById('frmPredictions')?.addEventListener('submit', (event) => {
+    event.preventDefault();
 
-    // Set up event listeners
-    document.getElementById('frmLogin').addEventListener('submit', handleLogin)
-    document.getElementById('frmPredictions').addEventListener('submit', handleSubmitPredictions)
-})
+    const username = localStorage.getItem('username');
+    if (!username) {
+        Swal.fire('Error', 'You must log in first.', 'error');
+        return;
+    }
+
+    const predictions = [];
+    document.querySelectorAll('#divBowlGameContainer input[type="radio"]:checked').forEach((input) => {
+        predictions.push({ game: input.name, prediction: input.value });
+    });
+
+    fetch(`${BASE_URL}/api/predictions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, predictions }),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        if (data.error) {
+            Swal.fire('Error', data.error, 'error');
+        } else {
+            Swal.fire('Success', 'Predictions submitted successfully!', 'success');
+        }
+    })
+    .catch((err) => {
+        console.error('Error during predictions submission:', err);
+        Swal.fire('Error', 'An unexpected error occurred.', 'error');
+    });
+});

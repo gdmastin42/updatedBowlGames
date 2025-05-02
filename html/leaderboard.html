@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <link href="/lib/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-white">
+    <div class="container py-5">
+        <h1 class="text-center mb-4">Leaderboard</h1>
+        <table class="table table-dark table-striped">
+            <thead>
+                <tr>
+                <th>Rank</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Score</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboardTable">
+                <!-- Leaderboard data will be populated here -->
+            </tbody>
+        </table>
+        <div class="text-center mt-4">
+            <a href="index.html" class="btn btn-light">Back to Predictions</a>
+        </div>
+    </div>
+
+    <script src="/js/leaderboard.js"></script>
+</body>
+</html>

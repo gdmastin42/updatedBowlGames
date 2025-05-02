@@ -1,3 +1,5 @@
+const BASE_URL = 'http://localhost:8000';
+
 // Bowl games data structure
 const bowlGames = [
     // Traditional Bowl Games (35)
@@ -57,13 +59,9 @@ const bowlGames = [
     { id: 46, name: "National Championship", team1: "Rose Bowl Winner", team2: "Cotton Bowl Winner", type: "championship" }
 ]
 
-require('dotenv').config();
-
-const BASE_URL = 'http://localhost:8000';
-const CFB_API_KEY = process.env.CFB_API_KEY;
-
-document.addEventListener('DOMContentLoaded', async function() {
-    generateBowlGameCards();
+document.addEventListener('DOMContentLoaded', async () => {
+    const teamLogos = await fetchTeamLogos();
+    generateBowlGameCards(teamLogos);
 
     document.getElementById('btnLeaderboard')?.addEventListener('click', () => {
         window.location.href = 'leaderboard.html';
@@ -74,45 +72,47 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
 });
 
-// Function to fetch team logos
+// Fetch logos with fallback
 async function fetchTeamLogos() {
-    const response = await fetch("https://apinext.collegefootballdata.com/teams/fbs", {
-        headers: {
-            "Authorization": `Bearer ${CFB_API_KEY}`
-        }
-    });
+    try {
+        const keyResponse = await fetch(`${BASE_URL}/api/key`);
+        const { apiKey } = await keyResponse.json();
 
-    if (!response.ok) {
-        console.error("Failed to fetch team logos:", response.statusText);
+        const response = await fetch("https://apinext.collegefootballdata.com/teams/fbs", {
+            headers: {
+                "Authorization": `Bearer ${apiKey}`
+            }
+        });
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const teams = await response.json();
+
+        const logos = {};
+        teams.forEach(team => {
+            logos[team.school] = team.logos?.[0] || "";
+        });
+        return logos;
+
+    } catch (err) {
+        console.error("⚠️ Failed to fetch team logos:", err);
         return {};
     }
-
-    const teams = await response.json();
-    const teamLogos = {};
-    teams.forEach(team => {
-        teamLogos[team.school] = team.logos[0];
-    });
-
-    return teamLogos;
 }
 
-// Function to generate all bowl game cards
-async function generateBowlGameCards() {
+
+// Render game cards
+function generateBowlGameCards(teamLogos) {
     const container = document.getElementById('divBowlGameContainer');
-    const teamLogos = await fetchTeamLogos();
+    if (!container) return;
 
     bowlGames.forEach(game => {
         const gameCard = document.createElement('div');
         gameCard.className = 'col-md-6 col-lg-4 mb-3';
 
         let cardClass = 'card game-card h-100';
-        if (game.type === 'playoff') {
-            cardClass += ' playoff-game';
-        } else if (game.type === 'semifinal') {
-            cardClass += ' semifinal-game';
-        } else if (game.type === 'championship') {
-            cardClass += ' championship-game';
-        }
+        if (game.type === 'playoff') cardClass += ' playoff-game';
+        if (game.type === 'semifinal') cardClass += ' semifinal-game';
+        if (game.type === 'championship') cardClass += ' championship-game';
 
         const team1Logo = teamLogos[game.team1] || '';
         const team2Logo = teamLogos[game.team2] || '';
@@ -144,7 +144,7 @@ async function generateBowlGameCards() {
     });
 }
 
-// Handle login form submission
+// Handle login
 document.getElementById('frmLogin')?.addEventListener('submit', (event) => {
     event.preventDefault();
 
@@ -163,24 +163,24 @@ document.getElementById('frmLogin')?.addEventListener('submit', (event) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ firstName, lastName }),
     })
-    .then((response) => response.json())
-    .then((data) => {
+    .then(res => res.json())
+    .then(data => {
         if (data.error) {
             Swal.fire('Error', data.error, 'error');
         } else {
             localStorage.setItem('username', username);
-            document.getElementById('divLogin').classList.add('d-none');
-            document.getElementById('divPredictionContainer').classList.remove('d-none');
+            document.getElementById('divLogin')?.classList.add('d-none');
+            document.getElementById('divPredictionContainer')?.classList.remove('d-none');
             document.getElementById('txtUsername').textContent = username;
         }
     })
-    .catch((err) => {
+    .catch(err => {
         console.error('Error during login:', err);
         Swal.fire('Error', 'An unexpected error occurred.', 'error');
     });
 });
 
-// Handle predictions form submission
+// Handle prediction submission
 document.getElementById('frmPredictions')?.addEventListener('submit', (event) => {
     event.preventDefault();
 
@@ -200,16 +200,16 @@ document.getElementById('frmPredictions')?.addEventListener('submit', (event) =>
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, predictions }),
     })
-    .then((response) => response.json())
-    .then((data) => {
+    .then(res => res.json())
+    .then(data => {
         if (data.error) {
             Swal.fire('Error', data.error, 'error');
         } else {
             Swal.fire('Success', 'Predictions submitted successfully!', 'success');
         }
     })
-    .catch((err) => {
-        console.error('Error during predictions submission:', err);
+    .catch(err => {
+        console.error('Error during prediction submission:', err);
         Swal.fire('Error', 'An unexpected error occurred.', 'error');
     });
 });

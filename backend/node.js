@@ -16,6 +16,12 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json())
+;
+
+// Serve API key to frontend (optional: add auth here)
+app.get('/api/key', (req, res) => {
+    res.json({ apiKey: process.env.API_KEY });
+});
 
 // Initialize SQLite database
 const db = new sqlite3.Database('./database/bowlGames.db', (err) => {

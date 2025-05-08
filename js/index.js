@@ -1,10 +1,8 @@
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'http://localhost:8000'
 
-// Bowl games data structure
 const bowlGames = [
-    // Traditional Bowl Games (35)
     { id: 1, name: "Bahamas Bowl", team1: "Toledo", team2: "UAB", type: "traditional" },
-    { id: 2, name: "Cure Bowl", team1: "Appalachian State", team2: "Miami (OH)", type: "traditional" },
+    { id: 2, name: "Cure Bowl", team1: "App State", team2: "Miami (OH)", type: "traditional" },
     { id: 3, name: "New Orleans Bowl", team1: "Louisiana", team2: "Jacksonville State", type: "traditional" },
     { id: 4, name: "Myrtle Beach Bowl", team1: "Old Dominion", team2: "Western Kentucky", type: "traditional" },
     { id: 5, name: "Famous Idaho Potato Bowl", team1: "Utah State", team2: "Georgia State", type: "traditional" },
@@ -13,7 +11,7 @@ const bowlGames = [
     { id: 8, name: "LA Bowl", team1: "Boise State", team2: "UCLA", type: "traditional" },
     { id: 9, name: "Independence Bowl", team1: "California", team2: "UCF", type: "traditional" },
     { id: 10, name: "Gasparilla Bowl", team1: "Florida", team2: "Memphis", type: "traditional" },
-    { id: 11, name: "Hawaii Bowl", team1: "San Jose State", team2: "Army", type: "traditional" },
+    { id: 11, name: "Hawaii Bowl", team1: "San José State", team2: "Army", type: "traditional" },
     { id: 12, name: "Quick Lane Bowl", team1: "Minnesota", team2: "Northern Illinois", type: "traditional" },
     { id: 13, name: "Camellia Bowl", team1: "Troy", team2: "Ohio", type: "traditional" },
     { id: 14, name: "First Responder Bowl", team1: "Texas Tech", team2: "Tulane", type: "traditional" },
@@ -38,84 +36,161 @@ const bowlGames = [
     { id: 33, name: "Las Vegas Bowl", team1: "Colorado", team2: "Washington State", type: "traditional" },
     { id: 34, name: "Armed Forces Bowl", team1: "Air Force", team2: "Houston", type: "traditional" },
     { id: 35, name: "TaxSlayer Gator Bowl", team1: "Duke", team2: "Arkansas", type: "traditional" },
-    
-    // CFP First Round (4)
     { id: 36, name: "CFP First Round Game 1", team1: "Ohio State (#9)", team2: "Miami (#8)", type: "playoff" },
     { id: 37, name: "CFP First Round Game 2", team1: "Indiana (#12)", team2: "Georgia (#5)", type: "playoff" },
     { id: 38, name: "CFP First Round Game 3", team1: "Ole Miss (#11)", team2: "Penn State (#6)", type: "playoff" },
     { id: 39, name: "CFP First Round Game 4", team1: "Missouri (#10)", team2: "Texas (#7)", type: "playoff" },
-    
-    // CFP Quarterfinals (4)
     { id: 40, name: "Sugar Bowl - Quarterfinal", team1: "Alabama (#4)", team2: "Winner of Game 37", type: "playoff" },
     { id: 41, name: "Fiesta Bowl - Quarterfinal", team1: "Oregon (#3)", team2: "Winner of Game 38", type: "playoff" },
     { id: 42, name: "Peach Bowl - Quarterfinal", team1: "Michigan (#2)", team2: "Winner of Game 39", type: "playoff" },
     { id: 43, name: "Orange Bowl - Quarterfinal", team1: "Ohio State (#1)", team2: "Winner of Game 36", type: "playoff" },
-    
-    // CFP Semifinals (2)
     { id: 44, name: "Rose Bowl - Semifinal", team1: "Fiesta Bowl Winner", team2: "Peach Bowl Winner", type: "semifinal" },
     { id: 45, name: "Cotton Bowl - Semifinal", team1: "Sugar Bowl Winner", team2: "Orange Bowl Winner", type: "semifinal" },
-    
-    // National Championship (1)
     { id: 46, name: "National Championship", team1: "Rose Bowl Winner", team2: "Cotton Bowl Winner", type: "championship" }
 ]
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const teamLogos = await fetchTeamLogos();
-    generateBowlGameCards(teamLogos);
+    const teamLogos = await fetchTeamLogos()
+    generateBowlGameCards(teamLogos)
 
     document.getElementById('btnLeaderboard')?.addEventListener('click', () => {
-        window.location.href = 'leaderboard.html';
-    });
+        window.location.href = 'leaderboard.html'
+    })
 
-    document.getElementById('btnGameResults')?.addEventListener('click', () => {
-        window.location.href = 'gameResults.html';
-    });
-});
+    document.getElementById('btnGameResults')?.addEventListener('click', (event) => {
+        event.preventDefault()
+        window.location.href = 'gameResults.html'
+    })
 
-// Fetch logos with fallback
+    document.getElementById('btnViewLeaderboard')?.addEventListener('click', async (event) => {
+        event.preventDefault()
+
+        const response = await fetch(`${BASE_URL}/api/leaderboard`)
+        const data = await response.json()
+
+        const categories = data.map(user => user.username.replace('_', ' '))
+        const scores = data.map(user => user.score)
+
+        const options = {
+            chart: {
+                type: 'bar',
+                height: 350
+            },
+            series: [
+                {
+                    name: 'Correct Predictions',
+                    data: scores
+                }
+            ],
+            xaxis: {
+                categories
+            },
+            title: {
+                text: 'Leaderboard',
+                align: 'center'
+            }
+        }
+
+        const chartContainer = document.getElementById('chartContainer')
+        chartContainer.innerHTML = ''
+        const chart = new ApexCharts(chartContainer, options)
+        chart.render()
+
+        document.getElementById('chartModalLabel').textContent = 'Leaderboard'
+        const modal = new bootstrap.Modal(document.getElementById('chartModal'))
+        modal.show()
+    })
+
+    document.getElementById('btnCheckGameResults')?.addEventListener('click', async (event) => {
+        event.preventDefault()   // Prevents default button behavior
+        event.stopPropagation()  // Stops the event from bubbling to other listeners
+    
+        const response = await fetch(`${BASE_URL}/api/gameResults`)
+        const data = await response.json()
+    
+        const tableContainer = document.getElementById('chartContainer')
+        tableContainer.innerHTML = `
+            <table id="gameResultsTable" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Team 1</th>
+                        <th>Team 2</th>
+                        <th>Winner</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map(game => `
+                        <tr>
+                            <td>${game.team1}</td>
+                            <td>${game.team2}</td>
+                            <td>${game.winner || 'N/A'}</td>
+                            <td>${game.score || 'N/A'}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `
+    
+        $('#gameResultsTable').DataTable()
+    
+        document.getElementById('chartModalLabel').textContent = 'Game Results'
+        const modal = new bootstrap.Modal(document.getElementById('chartModal'))
+        modal.show()
+    })
+    
+    const storedUsername = localStorage.getItem('username')
+    if (storedUsername) {
+        const formattedUsername = storedUsername.replace('_', ' ')
+        const usernameElement = document.getElementById('txtUsername')
+        if (usernameElement) {
+            usernameElement.textContent = formattedUsername
+        }
+    } else {
+        console.warn('No username found in localStorage')
+    }
+})
+
 async function fetchTeamLogos() {
     try {
-        const keyResponse = await fetch(`${BASE_URL}/api/key`);
-        const { apiKey } = await keyResponse.json();
+        const keyResponse = await fetch(`${BASE_URL}/api/key`)
+        const { apiKey } = await keyResponse.json()
 
         const response = await fetch("https://apinext.collegefootballdata.com/teams/fbs", {
             headers: {
                 "Authorization": `Bearer ${apiKey}`
             }
-        });
+        })
 
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const teams = await response.json();
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        const teams = await response.json()
 
-        const logos = {};
+        const logos = {}
         teams.forEach(team => {
-            logos[team.school] = team.logos?.[0] || "";
-        });
-        return logos;
-
+            logos[team.school] = team.logos?.[0] || ""
+        })
+        return logos
     } catch (err) {
-        console.error("⚠️ Failed to fetch team logos:", err);
-        return {};
+        console.error("Failed to fetch team logos:", err)
+        return {}
     }
 }
 
-
-// Render game cards
 function generateBowlGameCards(teamLogos) {
-    const container = document.getElementById('divBowlGameContainer');
-    if (!container) return;
+    const container = document.getElementById('divBowlGameContainer')
+    if (!container) return
 
     bowlGames.forEach(game => {
-        const gameCard = document.createElement('div');
-        gameCard.className = 'col-md-6 col-lg-4 mb-3';
+        const gameCard = document.createElement('div')
+        gameCard.className = 'col-md-6 col-lg-4 mb-3'
 
-        let cardClass = 'card game-card h-100';
-        if (game.type === 'playoff') cardClass += ' playoff-game';
-        if (game.type === 'semifinal') cardClass += ' semifinal-game';
-        if (game.type === 'championship') cardClass += ' championship-game';
+        let cardClass = 'card game-card h-100'
+        if (game.type === 'playoff') cardClass += ' playoff-game'
+        if (game.type === 'semifinal') cardClass += ' semifinal-game'
+        if (game.type === 'championship') cardClass += ' championship-game'
 
-        const team1Logo = teamLogos[game.team1] || '';
-        const team2Logo = teamLogos[game.team2] || '';
+        const team1Logo = teamLogos[game.team1] || ''
+        const team2Logo = teamLogos[game.team2] || ''
 
         gameCard.innerHTML = `
         <div class="${cardClass}">
@@ -125,91 +200,54 @@ function generateBowlGameCards(teamLogos) {
                     <div class="form-check d-flex align-items-center">
                         <input class="form-check-input me-2" type="radio" name="game${game.id}" id="game${game.id}-team1" value="${game.team1}" required>
                         <label class="form-check-label d-flex align-items-center" for="game${game.id}-team1">
-                            ${team1Logo ? `<img src="${team1Logo}" alt="${game.team1} logo" class="me-2" style="width: 24px; height: 24px;">` : ''}
+                            ${team1Logo ? `<img src="${team1Logo}" alt="${game.team1} logo" class="me-2" style="width: 50px; height: 50px;">` : ''}
                             ${game.team1}
                         </label>
                     </div>
                     <div class="form-check d-flex align-items-center">
                         <input class="form-check-input me-2" type="radio" name="game${game.id}" id="game${game.id}-team2" value="${game.team2}">
                         <label class="form-check-label d-flex align-items-center" for="game${game.id}-team2">
-                            ${team2Logo ? `<img src="${team2Logo}" alt="${game.team2} logo" class="me-2" style="width: 24px; height: 24px;">` : ''}
+                            ${team2Logo ? `<img src="${team2Logo}" alt="${game.team2} logo" class="me-2" style="width: 50px; height: 50px;">` : ''}
                             ${game.team2}
                         </label>
                     </div>
                 </div>
             </div>
-        </div>`;
+        </div>`
 
-        container.appendChild(gameCard);
-    });
+        container.appendChild(gameCard)
+    })
 }
 
-// Handle login
-document.getElementById('frmLogin')?.addEventListener('submit', (event) => {
-    event.preventDefault();
-
-    const firstName = document.getElementById('txtFirstName').value.trim();
-    const lastName = document.getElementById('txtLastName').value.trim();
-
-    if (!firstName || !lastName) {
-        Swal.fire('Error', 'First name and last name are required.', 'error');
-        return;
-    }
-
-    const username = `${firstName.toLowerCase()}_${lastName.toLowerCase()}`;
-
-    fetch(`${BASE_URL}/api/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstName, lastName }),
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.error) {
-            Swal.fire('Error', data.error, 'error');
-        } else {
-            localStorage.setItem('username', username);
-            document.getElementById('divLogin')?.classList.add('d-none');
-            document.getElementById('divPredictionContainer')?.classList.remove('d-none');
-            document.getElementById('txtUsername').textContent = username;
-        }
-    })
-    .catch(err => {
-        console.error('Error during login:', err);
-        Swal.fire('Error', 'An unexpected error occurred.', 'error');
-    });
-});
-
-// Handle prediction submission
 document.getElementById('frmPredictions')?.addEventListener('submit', (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
-    const username = localStorage.getItem('username');
-    if (!username) {
-        Swal.fire('Error', 'You must log in first.', 'error');
-        return;
+    const userID = localStorage.getItem('userID')
+    if (!userID) {
+        Swal.fire('Error', 'You must log in first.', 'error')
+        return
     }
 
-    const predictions = [];
+    const predictions = []
     document.querySelectorAll('#divBowlGameContainer input[type="radio"]:checked').forEach((input) => {
-        predictions.push({ game: input.name, prediction: input.value });
-    });
+        predictions.push({ gameID: input.name.replace('game', ''), predictedWinner: input.value })
+    })
 
     fetch(`${BASE_URL}/api/predictions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, predictions }),
+        body: JSON.stringify({ userID, predictions })
     })
     .then(res => res.json())
     .then(data => {
         if (data.error) {
-            Swal.fire('Error', data.error, 'error');
+            Swal.fire('Error', data.error, 'error')
         } else {
-            Swal.fire('Success', 'Predictions submitted successfully!', 'success');
+            Swal.fire('Success', 'Predictions submitted successfully!', 'success')
         }
     })
     .catch(err => {
-        console.error('Error during prediction submission:', err);
-        Swal.fire('Error', 'An unexpected error occurred.', 'error');
-    });
-});
+        console.error('Error during prediction submission:', err)
+        Swal.fire('Error', 'An unexpected error occurred.', 'error')
+    })
+})

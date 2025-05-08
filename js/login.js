@@ -1,18 +1,18 @@
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'http://localhost:8000'
 
 // Handle login form submission
 document.getElementById('frmLogin')?.addEventListener('submit', (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
-    const firstName = document.getElementById('txtFirstName').value.trim();
-    const lastName = document.getElementById('txtLastName').value.trim();
+    const firstName = document.getElementById('txtFirstName').value.trim()
+    const lastName = document.getElementById('txtLastName').value.trim()
 
     if (!firstName || !lastName) {
-        Swal.fire('Error', 'First name and last name are required.', 'error');
-        return;
+        Swal.fire('Error', 'First name and last name are required.', 'error')
+        return
     }
 
-    const username = `${firstName.toLowerCase()}_${lastName.toLowerCase()}`;
+    const username = `${firstName.toLowerCase()}_${lastName.toLowerCase()}`
 
     fetch(`${BASE_URL}/api/login`, {
         method: 'POST',
@@ -22,14 +22,14 @@ document.getElementById('frmLogin')?.addEventListener('submit', (event) => {
     .then((response) => response.json())
     .then((data) => {
         if (data.error) {
-            Swal.fire('Error', data.error, 'error');
+            Swal.fire('Error', data.error, 'error')
         } else {
-            localStorage.setItem('username', username);
-            window.location.href = 'index.html';
+            localStorage.setItem('username', username)
+            window.location.href = 'index.html'
         }
     })
     .catch((err) => {
-        console.error('Error during login:', err);
-        Swal.fire('Error', 'An unexpected error occurred.', 'error');
-    });
-});
+        console.error('Error during login:', err)
+        Swal.fire('Error', 'An unexpected error occurred.', 'error')
+    })
+})

@@ -4,21 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>2024-25 Bowl Season Predictions</title>
-  <!-- bootstrap -->
+  <!-- load bootstrap -->
   <link rel="stylesheet" href="/lib/css/bootstrap.min.css">
-  <!-- custom css -->
+  <!-- load jquery -->
+  <link rel="stylesheet" href="/lib/css/jquery.dataTables.min.css">
+  <!-- load custom css -->
   <link href="/css/styles.css" rel="stylesheet">
 </head>
 <body class="bg-dark">
   <!-- Predictions Form -->
   <div class="container py-5">
     <div id="divPredictionContainer">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-white">2024-25 Bowl Season Predictions</h2>
-        <div>
-          <span id="txtUsername" class="text-white me-3"></span>
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <h2 class="text-white me-auto">2024-25 Bowl Season Predictions</h2>
+        <div class="d-flex gap-2 flex-wrap">
+          <button id="btnViewLeaderboard" type="button" class="btn btn-primary flex-fill">View Leaderboard</button>
+          <button id="btnCheckGameResults" type="button" class="btn btn-secondary flex-fill">Check Game Results</button>
         </div>
-      </div>
+        <span id="txtUsername" class="text-white ms-2 mt-2 mt-md-0"></span>
+      </div>      
 
       <!-- Legend -->
       <div class="card mb-4 p-3">
@@ -43,6 +47,7 @@
         </div>
       </div>
 
+      <!-- Form -->
       <form id="frmPredictions">
         <div class="row" id="divBowlGameContainer">
           <!-- Bowl games will be generated here -->
@@ -54,12 +59,33 @@
       </form>
     </div>
   </div>
+
+  <!-- Modal for displaying charts -->
+  <div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="chartModalLabel">Chart</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="chartContainer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Load Bootstrap JS -->
   <script src="/lib/js/bootstrap.bundle.min.js"></script>
   <!-- sweet alerts -->
   <script src="/lib/js/sweetalert2@11.js"></script>
+  <!-- Load ApexCharts -->
+  <script src="/lib/js/apexcharts.js"></script>
+  <!-- Load jquery-->
+  <script src="/lib/js/jquery-3.6.0.min.js"></script>
+  <!-- load datatables -->
+  <script src="/lib/js/jquery.dataTables.min.js"></script>
   <!-- Load our custom JavaScript file -->
   <script src="/js/index.js"></script>
-
 </body>
 </html>

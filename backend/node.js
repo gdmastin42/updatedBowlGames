@@ -2,7 +2,8 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const sqlite3 = require('sqlite3').verbose()
-require('dotenv').config();
+const {v4:uuidv4} = require('uuid')
+require('dotenv').config()
 
 const app = express()
 const PORT = 8000
@@ -12,16 +13,10 @@ const corsOptions = {
     origin: 'http://127.0.0.1:5500', // Allow requests from your frontend
     methods: ['GET', 'POST'],       // Specify allowed HTTP methods
     allowedHeaders: ['Content-Type'] // Specify allowed headers
-};
+}
 
-app.use(cors(corsOptions));
+app.use(cors(corsOptions))
 app.use(bodyParser.json())
-;
-
-// Serve API key to frontend (optional: add auth here)
-app.get('/api/key', (req, res) => {
-    res.json({ apiKey: process.env.API_KEY });
-});
 
 // Initialize SQLite database
 const db = new sqlite3.Database('./database/bowlGames.db', (err) => {
@@ -30,20 +25,62 @@ const db = new sqlite3.Database('./database/bowlGames.db', (err) => {
     } else {
         console.log('Connected to SQLite database.')
         db.run(`
-            CREATE TABLE IF NOT EXISTS users (
-                username TEXT PRIMARY KEY,
-                firstName TEXT NOT NULL,
-                lastName TEXT NOT NULL
+            CREATE TABLE IF NOT EXISTS tblUsers (
+                userID TEXT PRIMARY KEY,
+                username TEXT UNIQUE NOT NULL
             )
         `)
         db.run(`
-            CREATE TABLE IF NOT EXISTS predictions (
-                username TEXT NOT NULL,
-                predictionData TEXT NOT NULL,
-                PRIMARY KEY (username),
-                FOREIGN KEY (username) REFERENCES users(username)
+            CREATE TABLE IF NOT EXISTS tblBowlGames (
+                gameID TEXT PRIMARY KEY,
+                gameName TEXT NOT NULL,
+                team1 TEXT NOT NULL,
+                team2 TEXT NOT NULL,
+                type TEXT NOT NULL,
+                score TEXT
             )
         `)
+        db.run(`
+            CREATE TABLE IF NOT EXISTS tblPredictions (
+                prediction_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                userID TEXT NOT NULL,
+                gameID TEXT NOT NULL,
+                predictedWinner TEXT NOT NULL,
+                FOREIGN KEY (userID) REFERENCES tblUsers(userID),
+                FOREIGN KEY (gameID) REFERENCES tblBowlGames(gameID)
+            )
+        `)
+
+        // Example of inserting a new game
+        db.run(
+            'INSERT INTO tblBowlGames (gameID, gameName, team1, team2, type, score) VALUES (?, ?, ?, ?, ?, ?)',
+            [uuidv4(), 'Example Bowl Game', 'Team A', 'Team B', 'traditional', null],
+            (err) => {
+                if (err) {
+                    console.error('Error inserting game:', err.message)
+                }
+            }
+        )
+
+        db.all('SELECT * FROM tblBowlGames', (err, rows) => {
+            if (err) {
+                console.error('Error fetching games:', err.message)
+                return
+            }
+
+            rows.forEach((row) => {
+                const newGameID = uuidv4()
+                db.run(
+                    'UPDATE tblBowlGames SET gameID = ? WHERE gameID = ?',
+                    [newGameID, row.gameID],
+                    (err) => {
+                        if (err) {
+                            console.error('Error updating gameID:', err.message)
+                        }
+                    }
+                )
+            })
+        })
     }
 })
 
@@ -56,8 +93,9 @@ app.post('/api/login', (req, res) => {
     }
 
     const username = `${firstName.toLowerCase()}_${lastName.toLowerCase()}`
+    const userID = uuidv4() // Generate UUID using uuidv4 library
 
-    db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
+    db.get('SELECT * FROM tblUsers WHERE username = ?', [username], (err, row) => {
         if (err) {
             return res.status(500).json({ error: 'Database error.' })
         }
@@ -65,74 +103,48 @@ app.post('/api/login', (req, res) => {
         if (!row) {
             // Register the user if they don't exist
             db.run(
-                'INSERT INTO users (username, firstName, lastName) VALUES (?, ?, ?)',
-                [username, firstName, lastName],
+                'INSERT INTO tblUsers (userID, username) VALUES (?, ?)',
+                [userID, username],
                 (err) => {
                     if (err) {
                         return res.status(500).json({ error: 'Database error.' })
                     }
-                    res.json({ message: 'Login successful', username })
+                    res.json({ message: 'Login successful', username, userID })
                 }
             )
         } else {
-            res.json({ message: 'Login successful', username })
+            res.json({ message: 'Login successful', username, userID: row.userID })
         }
     })
 })
 
 // Route to handle predictions submission
 app.post('/api/predictions', (req, res) => {
-    const { username, predictions } = req.body
+    const { userID, predictions } = req.body
 
-    if (!username || !predictions) {
-        return res.status(400).json({ error: 'Username and predictions are required.' })
+    if (!userID || !predictions) {
+        return res.status(400).json({ error: 'User ID and predictions are required.' })
     }
 
-    db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
-        if (err) {
-            return res.status(500).json({ error: 'Database error.' })
-        }
+    const insertPrediction = db.prepare(`
+        INSERT INTO tblPredictions (prediction_id, userID, gameID, predictedWinner)
+        VALUES (?, ?, ?, ?)
+    `)
 
-        if (!row) {
-            return res.status(404).json({ error: 'User not found.' })
-        }
-
-        const predictionData = JSON.stringify(predictions)
-        db.run(
-            'INSERT OR REPLACE INTO predictions (username, predictionData) VALUES (?, ?)',
-            [username, predictionData],
-            (err) => {
+    db.serialize(() => {
+        predictions.forEach(({ gameID, predictedWinner }) => {
+            const predictionID = uuidv4() // Generate a UUID for prediction_id
+            insertPrediction.run(predictionID, userID, gameID, predictedWinner, (err) => {
                 if (err) {
-                    return res.status(500).json({ error: 'Database error.' })
+                    console.error('Error inserting prediction:', err.message)
                 }
-                res.json({ message: 'Predictions saved successfully.' })
-            }
-        )
-    })
-})
-
-// Route to fetch user data (optional)
-app.get('/api/user/:username', (req, res) => {
-    const { username } = req.params
-
-    db.get('SELECT * FROM users WHERE username = ?', [username], (err, userRow) => {
-        if (err) {
-            return res.status(500).json({ error: 'Database error.' })
-        }
-
-        if (!userRow) {
-            return res.status(404).json({ error: 'User not found.' })
-        }
-
-        db.get('SELECT predictionData FROM predictions WHERE username = ?', [username], (err, predictionRow) => {
+            })
+        })
+        insertPrediction.finalize((err) => {
             if (err) {
                 return res.status(500).json({ error: 'Database error.' })
             }
-
-            res.json({
-                ...userRow,
-                predictions: predictionRow ? JSON.parse(predictionRow.predictionData) : {}
-            })
+            res.json({ message: 'Predictions saved successfully.' })
         })
     })
 })
@@ -140,28 +152,41 @@ app.get('/api/user/:username', (req, res) => {
 // Route to fetch leaderboard data
 app.get('/api/leaderboard', (req, res) => {
     db.all(`
-        SELECT u.firstName, u.lastName, COUNT(p.username) AS score
-        FROM users u
-        LEFT JOIN predictions p ON u.username = p.username
-        GROUP BY u.username
+        SELECT u.username, COUNT(p.predictionID) AS score
+        FROM tblUsers u
+        LEFT JOIN tblPredictions p ON u.userID = p.userID
+        GROUP BY u.userID, u.username
         ORDER BY score DESC
     `, (err, rows) => {
         if (err) {
-        return res.status(500).json({ error: 'Database error.' })
+            console.error('Database error:', err.message)
+            return res.status(500).json({ error: 'Database error.' })
+        }
+        res.json(rows)
+    })    
+})
+
+// Route to fetch game results
+app.get('/api/gameResults', (req, res) => {
+    db.all(`
+        SELECT b.team1, b.team2, p.predictedWinner AS winner, b.score
+        FROM tblBowlGames b
+        LEFT JOIN tblPredictions p ON b.gameID = p.gameID
+    `, (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error.' })
         }
         res.json(rows)
     })
 })
 
-// Route to fetch game results
-app.get('/api/game-results', (req, res) => {
-  // Example game results data
-    const gameResults = [
-        { game: 'Game 1', winner: 'Team A', loser: 'Team B' },
-        { game: 'Game 2', winner: 'Team C', loser: 'Team D' },
-        // Add more games here
-    ]
-    res.json(gameResults)
+// Route to fetch API key
+app.get('/api/key', (req, res) => {
+    const apiKey = process.env.API_KEY // Ensure API_KEY is set in your .env file
+    if (!apiKey) {
+        return res.status(500).json({ error: 'API key not found.' })
+    }
+    res.json({ apiKey })
 })
 
 // Start the server

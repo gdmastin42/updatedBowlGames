@@ -4,6 +4,7 @@ const cors = require('cors')
 const sqlite3 = require('sqlite3').verbose()
 const {v4:uuidv4} = require('uuid')
 require('dotenv').config()
+const axios = require('axios')
 
 const app = express()
 const PORT = 8000
@@ -37,7 +38,8 @@ const db = new sqlite3.Database('./database/bowlGames.db', (err) => {
                 team1 TEXT NOT NULL,
                 team2 TEXT NOT NULL,
                 type TEXT NOT NULL,
-                score TEXT
+                score TEXT,
+                UNIQUE(gameName, team1, team2)
             )
         `)
         db.run(`
@@ -50,17 +52,6 @@ const db = new sqlite3.Database('./database/bowlGames.db', (err) => {
                 FOREIGN KEY (gameID) REFERENCES tblBowlGames(gameID)
             )
         `)
-
-        // Example of inserting a new game
-        db.run(
-            'INSERT INTO tblBowlGames (gameID, gameName, team1, team2, type, score) VALUES (?, ?, ?, ?, ?, ?)',
-            [uuidv4(), 'Example Bowl Game', 'Team A', 'Team B', 'traditional', null],
-            (err) => {
-                if (err) {
-                    console.error('Error inserting game:', err.message)
-                }
-            }
-        )
 
         db.all('SELECT * FROM tblBowlGames', (err, rows) => {
             if (err) {
@@ -81,6 +72,11 @@ const db = new sqlite3.Database('./database/bowlGames.db', (err) => {
                 )
             })
         })
+
+        // Auto-load bowl games on server start (optional)
+        axios.get('http://localhost:8000/api/fetch-bowl-games')
+            .then(() => console.log('Bowl games loaded on startup.'))
+            .catch(err => console.error('Failed to auto-load bowl games:', err.message))
     }
 })
 
@@ -169,14 +165,34 @@ app.get('/api/leaderboard', (req, res) => {
 // Route to fetch game results
 app.get('/api/gameResults', (req, res) => {
     db.all(`
-        SELECT b.team1, b.team2, p.predictedWinner AS winner, b.score
+        SELECT 
+            b.gameName, 
+            b.team1, 
+            b.team2, 
+            b.score
         FROM tblBowlGames b
-        LEFT JOIN tblPredictions p ON b.gameID = p.gameID
     `, (err, rows) => {
         if (err) {
             return res.status(500).json({ error: 'Database error.' })
         }
-        res.json(rows)
+        // Compute winner based on score
+        const results = rows.map(game => {
+            let winner = null
+            if (game.score && game.score.includes('-')) {
+                const [home, away] = game.score.split('-').map(Number)
+                if (!isNaN(home) && !isNaN(away)) {
+                    winner = home > away ? game.team1 : (away > home ? game.team2 : 'Tie')
+                }
+            }
+            return {
+                game: game.gameName,
+                team1: game.team1,
+                team2: game.team2,
+                winner,
+                score: game.score
+            }
+        })
+        res.json(results)
     })
 })
 
@@ -187,6 +203,77 @@ app.get('/api/key', (req, res) => {
         return res.status(500).json({ error: 'API key not found.' })
     }
     res.json({ apiKey })
+})
+
+// Route to fetch and store last year's bowl games from CFBD
+app.get('/api/fetch-bowl-games', async (req, res) => {
+    db.get('SELECT COUNT(*) as count FROM tblBowlGames', async (err, row) => {
+        if (err) return res.status(500).json({ error: 'Database error.' })
+        if (row.count > 0) {
+            return res.json({ message: 'Bowl games already loaded.' })
+        }
+
+        const apiKey = process.env.API_KEY
+        if (!apiKey) return res.status(500).json({ error: 'API key not set' })
+
+        try {
+            const response = await axios.get('https://api.collegefootballdata.com/games', {
+                params: {
+                    year: 2024,
+                    seasonType: 'postseason',
+                    classification: 'fbs'
+                },
+                headers: {
+                    Authorization: `Bearer ${apiKey}`
+                }
+            })
+
+            const games = response.data.filter(game => game.homeTeam && game.awayTeam)
+            const stmt = db.prepare(`INSERT OR IGNORE INTO tblBowlGames (gameID, gameName, team1, team2, type, score) VALUES (?, ?, ?, ?, ?, ?)`)
+
+            games.forEach(game => {
+                const type = game.venue && game.venue.includes("Rose Bowl") ? "semifinal" : "traditional"
+                const score = (game.homePoints !== null && game.awayPoints !== null)
+                    ? `${game.homePoints}-${game.awayPoints}`
+                    : null
+
+                stmt.run(
+                    uuidv4(),
+                    game.notes || game.venue || "Bowl Game",
+                    game.homeTeam,
+                    game.awayTeam,
+                    type,
+                    score
+                )
+            })
+
+            stmt.finalize()
+            res.json({ message: 'Bowl games loaded successfully.' })
+        } catch (err) {
+            console.error(err)
+            res.status(500).json({ error: 'Failed to fetch games from API.' })
+        }
+    })
+})
+
+// Route to fetch all bowl games
+app.get('/api/bowlGames', (req, res) => {
+    db.all('SELECT * FROM tblBowlGames', (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error.' })
+        }
+        res.json(rows)
+    })
+})
+
+// Route to delete all bowl games (for testing/resetting purposes)
+app.delete('/api/bowlGames', (req, res) => {
+    db.run('DELETE FROM tblBowlGames', (err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error.' })
+        }
+        res.json({ message: 'All bowl games deleted successfully.' })
+    })
 })
 
 // Start the server

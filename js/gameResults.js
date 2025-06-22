@@ -9,8 +9,8 @@ fetch(`${BASE_URL}/api/game-results`)
         gameDiv.className = 'card p-3 mb-3'
         gameDiv.innerHTML = `
             <h5>${game.game}</h5>
-            <p><strong>Winner:</strong> <span class="text-success">${game.winner}</span></p>
-            <p><strong>Loser:</strong> <span class="text-danger">${game.loser}</span></p>
+            <p><strong>Winner:</strong> <span class="text-success">${game.winner || 'N/A'}</span></p>
+            <p><strong>Score:</strong> ${game.score || 'N/A'}</p>
         `
         container.appendChild(gameDiv)
         })

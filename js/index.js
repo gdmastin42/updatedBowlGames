@@ -1,59 +1,14 @@
 const BASE_URL = 'http://localhost:8000'
-
-const bowlGames = [
-    { id: 1, name: "Bahamas Bowl", team1: "Toledo", team2: "UAB", type: "traditional" },
-    { id: 2, name: "Cure Bowl", team1: "App State", team2: "Miami (OH)", type: "traditional" },
-    { id: 3, name: "New Orleans Bowl", team1: "Louisiana", team2: "Jacksonville State", type: "traditional" },
-    { id: 4, name: "Myrtle Beach Bowl", team1: "Old Dominion", team2: "Western Kentucky", type: "traditional" },
-    { id: 5, name: "Famous Idaho Potato Bowl", team1: "Utah State", team2: "Georgia State", type: "traditional" },
-    { id: 6, name: "Boca Raton Bowl", team1: "South Florida", team2: "Syracuse", type: "traditional" },
-    { id: 7, name: "New Mexico Bowl", team1: "UTEP", team2: "Fresno State", type: "traditional" },
-    { id: 8, name: "LA Bowl", team1: "Boise State", team2: "UCLA", type: "traditional" },
-    { id: 9, name: "Independence Bowl", team1: "California", team2: "UCF", type: "traditional" },
-    { id: 10, name: "Gasparilla Bowl", team1: "Florida", team2: "Memphis", type: "traditional" },
-    { id: 11, name: "Hawaii Bowl", team1: "San José State", team2: "Army", type: "traditional" },
-    { id: 12, name: "Quick Lane Bowl", team1: "Minnesota", team2: "Northern Illinois", type: "traditional" },
-    { id: 13, name: "Camellia Bowl", team1: "Troy", team2: "Ohio", type: "traditional" },
-    { id: 14, name: "First Responder Bowl", team1: "Texas Tech", team2: "Tulane", type: "traditional" },
-    { id: 15, name: "Birmingham Bowl", team1: "Auburn", team2: "Marshall", type: "traditional" },
-    { id: 16, name: "Guaranteed Rate Bowl", team1: "Kansas", team2: "Boston College", type: "traditional" },
-    { id: 17, name: "Military Bowl", team1: "Navy", team2: "Pittsburgh", type: "traditional" },
-    { id: 18, name: "Duke's Mayo Bowl", team1: "NC State", team2: "Kentucky", type: "traditional" },
-    { id: 19, name: "Holiday Bowl", team1: "Louisville", team2: "Arizona", type: "traditional" },
-    { id: 20, name: "Texas Bowl", team1: "Oklahoma State", team2: "Texas A&M", type: "traditional" },
-    { id: 21, name: "Fenway Bowl", team1: "Virginia Tech", team2: "Cincinnati", type: "traditional" },
-    { id: 22, name: "Pinstripe Bowl", team1: "Rutgers", team2: "West Virginia", type: "traditional" },
-    { id: 23, name: "Pop-Tarts Bowl", team1: "Clemson", team2: "Iowa State", type: "traditional" },
-    { id: 24, name: "Alamo Bowl", team1: "Oklahoma", team2: "Utah", type: "traditional" },
-    { id: 25, name: "Gator Bowl", team1: "South Carolina", team2: "Notre Dame", type: "traditional" },
-    { id: 26, name: "Sun Bowl", team1: "Virginia", team2: "USC", type: "traditional" },
-    { id: 27, name: "Liberty Bowl", team1: "Mississippi State", team2: "Baylor", type: "traditional" },
-    { id: 28, name: "Music City Bowl", team1: "Illinois", team2: "LSU", type: "traditional" },
-    { id: 29, name: "Arizona Bowl", team1: "Wyoming", team2: "Ball State", type: "traditional" },
-    { id: 30, name: "ReliaQuest Bowl", team1: "Wisconsin", team2: "Missouri", type: "traditional" },
-    { id: 31, name: "Citrus Bowl", team1: "Iowa", team2: "Tennessee", type: "traditional" },
-    { id: 32, name: "Cotton Bowl", team1: "Washington", team2: "SMU", type: "traditional" },
-    { id: 33, name: "Las Vegas Bowl", team1: "Colorado", team2: "Washington State", type: "traditional" },
-    { id: 34, name: "Armed Forces Bowl", team1: "Air Force", team2: "Houston", type: "traditional" },
-    { id: 35, name: "TaxSlayer Gator Bowl", team1: "Duke", team2: "Arkansas", type: "traditional" },
-    { id: 36, name: "CFP First Round Game 1", team1: "Ohio State (#9)", team2: "Miami (#8)", type: "playoff" },
-    { id: 37, name: "CFP First Round Game 2", team1: "Indiana (#12)", team2: "Georgia (#5)", type: "playoff" },
-    { id: 38, name: "CFP First Round Game 3", team1: "Ole Miss (#11)", team2: "Penn State (#6)", type: "playoff" },
-    { id: 39, name: "CFP First Round Game 4", team1: "Missouri (#10)", team2: "Texas (#7)", type: "playoff" },
-    { id: 40, name: "Sugar Bowl - Quarterfinal", team1: "Alabama (#4)", team2: "Winner of Game 37", type: "playoff" },
-    { id: 41, name: "Fiesta Bowl - Quarterfinal", team1: "Oregon (#3)", team2: "Winner of Game 38", type: "playoff" },
-    { id: 42, name: "Peach Bowl - Quarterfinal", team1: "Michigan (#2)", team2: "Winner of Game 39", type: "playoff" },
-    { id: 43, name: "Orange Bowl - Quarterfinal", team1: "Ohio State (#1)", team2: "Winner of Game 36", type: "playoff" },
-    { id: 44, name: "Rose Bowl - Semifinal", team1: "Fiesta Bowl Winner", team2: "Peach Bowl Winner", type: "semifinal" },
-    { id: 45, name: "Cotton Bowl - Semifinal", team1: "Sugar Bowl Winner", team2: "Orange Bowl Winner", type: "semifinal" },
-    { id: 46, name: "National Championship", team1: "Rose Bowl Winner", team2: "Cotton Bowl Winner", type: "championship" }
-]
-
-let currentChart = null  // Add this at the top of your script
+let currentChart = null
 
 document.addEventListener('DOMContentLoaded', async () => {
     const teamLogos = await fetchTeamLogos()
-    generateBowlGameCards(teamLogos)
+
+    // Fetch bowl games from backend
+    const response = await fetch(`${BASE_URL}/api/bowlGames`)
+    const bowlGames = await response.json()
+
+    generateBowlGameCards(bowlGames, teamLogos)
 
     document.getElementById('btnLeaderboard')?.addEventListener('click', () => {
         window.location.href = 'leaderboard.html'
@@ -195,46 +150,60 @@ async function fetchTeamLogos() {
     }
 }
 
-function generateBowlGameCards(teamLogos) {
+// Update generateBowlGameCards to accept bowlGames as first argument
+function generateBowlGameCards(bowlGames, teamLogos) {
     const container = document.getElementById('divBowlGameContainer')
     if (!container) return
 
-    bowlGames.forEach(game => {
-        const gameCard = document.createElement('div')
-        gameCard.className = 'col-md-6 col-lg-4 mb-3'
+    container.innerHTML = ''
 
-        let cardClass = 'card game-card h-100'
-        if (game.type === 'playoff') cardClass += ' playoff-game'
-        if (game.type === 'semifinal') cardClass += ' semifinal-game'
-        if (game.type === 'championship') cardClass += ' championship-game'
+    // Only show games that are NOT playoff games
+    const traditionalGames = bowlGames.filter(
+        game => !game.gameName.includes("College Football Playoff")
+    )
 
+    traditionalGames.forEach(game => {
+        // Create the column wrapper for spacing
+        const col = document.createElement('div')
+        col.className = 'col-12 col-md-6 col-lg-4 mb-4'
+
+        // Create the card
+        const card = document.createElement('div')
+        card.className = 'card game-card h-100 p-3'
+
+        // Game name/title
+        const gameTitle = document.createElement('h5')
+        gameTitle.className = 'text-left-3'
+        gameTitle.textContent = game.gameName
+        card.appendChild(gameTitle)
+
+        // Team logos and radio buttons
         const team1Logo = teamLogos[game.team1] || ''
         const team2Logo = teamLogos[game.team2] || ''
 
-        gameCard.innerHTML = `
-        <div class="${cardClass}">
-            <div class="card-header">${game.name}</div>
+        card.innerHTML += `
             <div class="card-body">
                 <div class="mb-3">
                     <div class="form-check d-flex align-items-center">
-                        <input class="form-check-input me-2" type="radio" name="game${game.id}" id="game${game.id}-team1" value="${game.team1}" required>
-                        <label class="form-check-label d-flex align-items-center" for="game${game.id}-team1">
+                        <input class="form-check-input me-2" type="radio" name="game${game.gameID}" id="game${game.gameID}-team1" value="${game.team1}" required>
+                        <label class="form-check-label d-flex align-items-center" for="game${game.gameID}-team1">
                             ${team1Logo ? `<img src="${team1Logo}" alt="${game.team1} logo" class="me-2" style="width: 50px; height: 50px;">` : ''}
                             ${game.team1}
                         </label>
                     </div>
                     <div class="form-check d-flex align-items-center">
-                        <input class="form-check-input me-2" type="radio" name="game${game.id}" id="game${game.id}-team2" value="${game.team2}">
-                        <label class="form-check-label d-flex align-items-center" for="game${game.id}-team2">
+                        <input class="form-check-input me-2" type="radio" name="game${game.gameID}" id="game${game.gameID}-team2" value="${game.team2}">
+                        <label class="form-check-label d-flex align-items-center" for="game${game.gameID}-team2">
                             ${team2Logo ? `<img src="${team2Logo}" alt="${game.team2} logo" class="me-2" style="width: 50px; height: 50px;">` : ''}
                             ${game.team2}
                         </label>
                     </div>
                 </div>
             </div>
-        </div>`
+        `
 
-        container.appendChild(gameCard)
+        col.appendChild(card)
+        container.appendChild(col)
     })
 }
 
@@ -270,3 +239,205 @@ document.getElementById('frmPredictions')?.addEventListener('submit', (event) =>
         Swal.fire('Error', 'An unexpected error occurred.', 'error')
     })
 })
+
+document.getElementById('btnBuildBracket')?.addEventListener('click', async () => {
+    // Fetch all games and logos
+    const response = await fetch(`${BASE_URL}/api/bowlGames`)
+    const bowlGames = await response.json()
+    const teamLogos = await fetchTeamLogos()
+
+    // Get first round games in correct order
+    const firstRoundGames = bowlGames
+        .filter(game => game.gameName.includes("College Football Playoff First Round Game"))
+        .sort((a, b) => {
+            // Order: #12 vs #5, #9 vs #8, #11 vs #6, #10 vs #7
+            const order = ["#12", "#9", "#11", "#10"];
+            const getSeed = (game) => {
+                const match = game.notes?.match(/#\d+/g);
+                if (!match) return 99;
+                return order.indexOf(match[0]);
+            }
+            return getSeed(a) - getSeed(b);
+        });
+
+    // Helper for ranked name
+    const extractRankedName = (team, notes) => {
+        if (!notes) return team;
+        const regex = new RegExp(`#\\d+\\s+${team}`);
+        const match = notes.match(regex);
+        return match ? match[0] : team;
+    };
+
+    // Helper for logo (50x50, matches bowl game selections)
+    const getLogo = (team) =>
+        teamLogos[team] ? `<img src="${teamLogos[team]}" alt="${team} logo" class="me-2" style="width: 50px; height: 50px;">` : '';
+
+    // hard codded first round matchups for simplicity
+    const firstRoundMatchups = [
+        { team1: { name: "Clemson", rank: 12 }, team2: { name: "Texas", rank: 5 } },
+        { team1: { name: "Tennessee", rank: 9 }, team2: { name: "Ohio State", rank: 8 } },
+        { team1: { name: "SMU", rank: 11 }, team2: { name: "Penn State", rank: 6 } },
+        { team1: { name: "Indiana", rank: 10 }, team2: { name: "Notre Dame", rank: 7 } }
+    ];
+
+    // Manually set the top 4 seeds here:
+    // since the api does not provide this information
+    const topSeeds = [
+        { name: "Arizona State", rank: 4 },
+        { name: "Oregon", rank: 1 },
+        { name: "Boise State", rank: 3 },
+        { name: "Georgia", rank: 2 }
+    ];
+
+    // Build static bracket HTML
+    let bracketHtml = `
+    <div class="bracket-container">
+      <div class="bracket-round">
+        <h6 class="text-center text-dark mb-3">First Round</h6>
+        ${firstRoundMatchups.map((game, i) => `
+          <div class="bracket-matchup">
+            <div class="team">${getLogo(game.team1.name)}#${game.team1.rank} ${game.team1.name}</div>
+            <div class="team">${getLogo(game.team2.name)}#${game.team2.rank} ${game.team2.name}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="bracket-round">
+        <h6 class="text-center text-dark mb-3">Quarterfinals</h6>
+        ${topSeeds.map((seed, i) => {
+            const game = firstRoundMatchups[i];
+            return `
+              <div class="bracket-matchup">
+                  <div class="team">${getLogo(seed.name)}#${seed.rank} ${seed.name}</div>
+                  <div class="custom-dropdown" data-qf="${i}">
+                    <div class="dropdown-selected">Pick Winner</div>
+                    <div class="dropdown-list">
+                      <div class="dropdown-item d-flex align-items-center" data-value="${game.team1.name}">
+                        <span class="me-2" style="width:50px; height:50px; display:inline-block;">
+                          ${getLogo(game.team1.name)}
+                        </span>
+                        <span style="font-weight:bold;">#${game.team1.rank} ${game.team1.name}</span>
+                      </div>
+                      <div class="dropdown-item d-flex align-items-center" data-value="${game.team2.name}">
+                        <span class="me-2" style="width:50px; height:50px; display:inline-block;">
+                          ${getLogo(game.team2.name)}
+                        </span>
+                        <span style="font-weight:bold;">#${game.team2.rank} ${game.team2.name}</span>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+            `;
+        }).join('')}
+      </div>
+      <div class="bracket-round">
+        <h6 class="text-center text-dark mb-3">Semifinals</h6>
+        <div class="bracket-matchup">
+            <select class="form-select mt-2 bracket-semi-select" data-sf="0">
+                <option value="">Pick Winner</option>
+            </select>
+        </div>
+        <div class="bracket-matchup">
+            <select class="form-select mt-2 bracket-semi-select" data-sf="1">
+                <option value="">Pick Winner</option>
+            </select>
+        </div>
+      </div>
+      <div class="bracket-round">
+        <h6 class="text-center text-dark mb-3">National Title</h6>
+        <div class="bracket-matchup">
+            <select class="form-select mt-2 bracket-final-select">
+                <option value="">Pick Winner</option>
+            </select>
+        </div>
+      </div>
+    </div>
+    `;
+
+    document.getElementById('bracketContainer').innerHTML = bracketHtml;
+
+    // --- Bracket logic: advance winners to next round ---
+
+    // Helper: get the selected value/text from a custom dropdown
+    function getDropdownValue(dropdown) {
+        return dropdown.querySelector('.dropdown-selected').dataset.value || '';
+    }
+    function getDropdownText(dropdown) {
+        return dropdown.querySelector('.dropdown-selected').textContent || '';
+    }
+
+    const semiSelects = document.querySelectorAll('.bracket-semi-select');
+    const finalSelect = document.querySelector('.bracket-final-select');
+
+    function updateSemifinals() {
+        // SF1: QF0 vs QF1, SF2: QF2 vs QF3
+        const qfDropdowns = document.querySelectorAll('.custom-dropdown[data-qf]');
+        for (let i = 0; i < 2; i++) {
+            const sfSel = semiSelects[i];
+            sfSel.innerHTML = '<option value="">Pick Winner</option>';
+            for (let j = 0; j < 2; j++) {
+                const qfIdx = i * 2 + j;
+                const qfDropdown = qfDropdowns[qfIdx];
+                const val = getDropdownValue(qfDropdown);
+                const txt = getDropdownText(qfDropdown);
+                if (val) {
+                    // Find logo for this team
+                    const logoHtml = getLogo(val);
+                    // Create a new option with logo as HTML
+                    const opt = document.createElement('option');
+                    opt.value = val;
+                    opt.innerHTML = `${logoHtml}${txt}`;
+                    sfSel.appendChild(opt);
+                }
+            }
+        }
+        updateFinal();
+    }
+
+    function updateFinal() {
+        finalSelect.innerHTML = '<option value="">Pick Winner</option>';
+        semiSelects.forEach(sel => {
+            if (sel.value) {
+                // Find logo for this team
+                const logoHtml = getLogo(sel.value);
+                // Use the selected option's text (which already includes logo and name)
+                const opt = document.createElement('option');
+                opt.value = sel.value;
+                // Use the selected option's innerHTML for logo+name
+                opt.innerHTML = sel.options[sel.selectedIndex].innerHTML;
+                finalSelect.appendChild(opt);
+            }
+        });
+    }
+
+    // Attach listeners to custom dropdowns and semifinals
+    document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+        const selected = dropdown.querySelector('.dropdown-selected');
+        const list = dropdown.querySelector('.dropdown-list');
+        selected.addEventListener('click', () => {
+            dropdown.classList.toggle('open');
+        });
+        list.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', () => {
+                selected.innerHTML = item.innerHTML;
+                selected.dataset.value = item.dataset.value;
+                dropdown.classList.remove('open');
+                updateSemifinals(); // <-- update semifinals when a QF pick is made
+            });
+        });
+        // Optional: close dropdown if clicking outside
+        document.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
+    });
+
+    semiSelects.forEach(sel => sel.addEventListener('change', updateFinal));
+
+    // Initialize semifinals/final on modal open
+    updateSemifinals();
+
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('bracketModal'));
+    modal.show();
+});

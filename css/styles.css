@@ -1,5 +1,6 @@
 .game-card {
     transition: all 0.3s ease;
+    padding: 1rem; /* Add this for internal spacing */
 }
 
 .game-card:hover {
@@ -29,4 +30,107 @@
 .form-check-input:checked {
     background-color: #0d6efd; /* Optional: Add a blue fill when selected */
     border-color: #0d6efd; /* Optional: Change border color when selected */
+}
+
+.bracket-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+.bracket-round {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    min-width: 180px;
+}
+.bracket-matchup {
+    border-left: 2px solid gold;
+    padding-left: 16px;
+    margin-bottom: 2.5rem;
+    position: relative;
+}
+.bracket-matchup:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: -2px;
+    top: 100%;
+    width: 0;
+    height: 2.5rem;
+    border-left: 2px solid gold;
+}
+.team {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    color: rgb(0, 0, 0);
+    margin-bottom: 0.5rem;
+}
+.bracket-advance {
+    color: #000000;
+    font-weight: normal;
+    font-style: italic;
+}
+@media (max-width: 900px) {
+    .bracket-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    .bracket-round {
+        min-width: unset;
+        width: 100%;
+    }
+}
+
+.custom-dropdown {
+  position: relative;
+  width: 200px;
+  margin-top: 8px;
+  cursor: pointer;
+}
+.dropdown-selected {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 4px;
+  color: #222;
+}
+.dropdown-list {
+  display: none;
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  width: 100%;
+  z-index: 10;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.custom-dropdown.open .dropdown-list {
+  display: block;
+}
+.dropdown-item, .dropdown-selected {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  color: #222;
+  min-height: 50px;
+  font-size: 1rem;
+}
+.dropdown-item {
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  color: #222;
+}
+.dropdown-item:hover {
+  background: #eee;
+}
+.dropdown-item img, .dropdown-selected img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  margin-right: 0.5rem;
 }

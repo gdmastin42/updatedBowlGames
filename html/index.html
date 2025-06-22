@@ -20,31 +20,9 @@
         <div class="d-flex gap-2 flex-wrap">
           <button id="btnViewLeaderboard" type="button" class="btn btn-primary flex-fill">View Leaderboard</button>
           <button id="btnCheckGameResults" type="button" class="btn btn-secondary flex-fill">Check Game Results</button>
+          <button id="btnBuildBracket" type="button" class="btn btn-warning flex-fill">Build Playoff Bracket</button>
         </div>
         <span id="txtUsername" class="text-white ms-2 mt-2 mt-md-0"></span>
-      </div>      
-
-      <!-- Legend -->
-      <div class="card mb-4 p-3">
-        <h5>Game Types</h5>
-        <div class="d-flex flex-wrap gap-3">
-          <div class="d-flex align-items-center">
-            <div class="me-2" style="width: 20px; height: 20px; background-color: #fff; border: 1px solid #dee2e6;"></div>
-            <span>Traditional Bowl Games</span>
-          </div>
-          <div class="d-flex align-items-center">
-            <div class="me-2" style="width: 20px; height: 20px; background-color: #fff; border-left: 4px solid #ffc107;"></div>
-            <span>CFP First Round & Quarterfinals</span>
-          </div>
-          <div class="d-flex align-items-center">
-            <div class="me-2" style="width: 20px; height: 20px; background-color: #fff; border-left: 4px solid #fd7e14;"></div>
-            <span>CFP Semifinals</span>
-          </div>
-          <div class="d-flex align-items-center">
-            <div class="me-2" style="width: 20px; height: 20px; background-color: #fff; border-left: 4px solid #dc3545;"></div>
-            <span>National Championship</span>
-          </div>
-        </div>
       </div>
 
       <!-- Form -->
@@ -70,6 +48,21 @@
         </div>
         <div class="modal-body">
           <div id="chartContainer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for displaying playoff bracket -->
+  <div class="modal fade" id="bracketModal" tabindex="-1" aria-labelledby="bracketModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="bracketModalLabel">Playoff Bracket</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="bracketContainer">
+          <!-- Bracket will be generated here -->
         </div>
       </div>
     </div>

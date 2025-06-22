@@ -49,6 +49,8 @@ const bowlGames = [
     { id: 46, name: "National Championship", team1: "Rose Bowl Winner", team2: "Cotton Bowl Winner", type: "championship" }
 ]
 
+let currentChart = null  // Add this at the top of your script
+
 document.addEventListener('DOMContentLoaded', async () => {
     const teamLogos = await fetchTeamLogos()
     generateBowlGameCards(teamLogos)
@@ -63,13 +65,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     })
 
     document.getElementById('btnViewLeaderboard')?.addEventListener('click', async (event) => {
-        event.preventDefault()
+        event.preventDefault() 
 
-        const response = await fetch(`${BASE_URL}/api/leaderboard`)
-        const data = await response.json()
+        const response = await fetch(`${BASE_URL}/api/leaderboard`) 
+        const data = await response.json() 
 
-        const categories = data.map(user => user.username.replace('_', ' '))
-        const scores = data.map(user => user.score)
+        const categories = data.map(user => user.username.replace('_', ' ')) 
+        const scores = data.map(user => user.score) 
 
         const options = {
             chart: {
@@ -89,26 +91,35 @@ document.addEventListener('DOMContentLoaded', async () => {
                 text: 'Leaderboard',
                 align: 'center'
             }
+        } 
+
+        const chartContainer = document.getElementById('chartContainer') 
+        chartContainer.innerHTML = '' 
+        if (currentChart) {
+            currentChart.destroy() 
+            currentChart = null 
         }
+        currentChart = new ApexCharts(chartContainer, options) 
+        currentChart.render() 
 
-        const chartContainer = document.getElementById('chartContainer')
-        chartContainer.innerHTML = ''
-        const chart = new ApexCharts(chartContainer, options)
-        chart.render()
-
-        document.getElementById('chartModalLabel').textContent = 'Leaderboard'
-        const modal = new bootstrap.Modal(document.getElementById('chartModal'))
-        modal.show()
+        document.getElementById('chartModalLabel').textContent = 'Leaderboard' 
+        const modal = new bootstrap.Modal(document.getElementById('chartModal')) 
+        modal.show() 
     })
 
     document.getElementById('btnCheckGameResults')?.addEventListener('click', async (event) => {
-        event.preventDefault()   // Prevents default button behavior
-        event.stopPropagation()  // Stops the event from bubbling to other listeners
-    
+        event.preventDefault() 
+        event.stopPropagation() 
+
         const response = await fetch(`${BASE_URL}/api/gameResults`)
         const data = await response.json()
-    
+
         const tableContainer = document.getElementById('chartContainer')
+        tableContainer.innerHTML = ''
+        if (currentChart) {
+            currentChart.destroy() 
+            currentChart = null 
+        }
         tableContainer.innerHTML = `
             <table id="gameResultsTable" class="display" style="width:100%">
                 <thead>
@@ -131,14 +142,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </tbody>
             </table>
         `
-    
+
         $('#gameResultsTable').DataTable()
-    
+
         document.getElementById('chartModalLabel').textContent = 'Game Results'
         const modal = new bootstrap.Modal(document.getElementById('chartModal'))
         modal.show()
     })
     
+    // Destroy chart when modal is hidden
+    $('#chartModal').on('hidden.bs.modal', function () {
+        if (currentChart) {
+            currentChart.destroy() 
+            currentChart = null 
+        }
+    }) 
+
     const storedUsername = localStorage.getItem('username')
     if (storedUsername) {
         const formattedUsername = storedUsername.replace('_', ' ')

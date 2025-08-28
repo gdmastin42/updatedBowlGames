@@ -12,6 +12,8 @@ const PORT = 8000
 // Middleware
 const corsOptions = {
 origin: [
+        'http://127.0.0.1:5500',
+        'https://localhost:5500',
         'https://college-football-hq.com',
         'https://www.college-football-hq.com'
     ],
@@ -77,7 +79,7 @@ const db = new sqlite3.Database('./database/bowlGames.db', (err) => {
         })
 
         // Auto-load bowl games on server start (optional)
-        axios.get(`${BASE_URL}/api/fetch-bowl-games`)
+        axios.get('http://localhost:8000/api/fetch-bowl-games')
             .then(() => console.log('Bowl games loaded on startup.'))
             .catch(err => console.error('Failed to auto-load bowl games:', err.message))
     }

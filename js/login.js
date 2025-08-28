@@ -25,7 +25,7 @@ document.getElementById('frmLogin')?.addEventListener('submit', (event) => {
             Swal.fire('Error', data.error, 'error')
         } else {
             localStorage.setItem('username', username)
-            window.location.href = 'index.html'
+            window.location.href = 'predictions.html'
         }
     })
     .catch((err) => {

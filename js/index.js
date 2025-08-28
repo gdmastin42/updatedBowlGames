@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             usernameElement.textContent = formattedUsername
         }
     } else {
-        console.warn('No username found in localStorage')
+        window.location.href = 'index.html'
     }
 })
 

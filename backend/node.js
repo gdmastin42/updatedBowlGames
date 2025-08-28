@@ -11,8 +11,13 @@ const PORT = 8000
 
 // Middleware
 const corsOptions = {
-    origin: 'http://127.0.0.1:5500', // Allow requests from your frontend
-    methods: ['GET', 'POST'],       // Specify allowed HTTP methods
+origin: [
+        'http://127.0.0.1:5500', // Allow requests from your frontend
+        'https://localhost:5500',
+        'https://college-football-hq.com',
+        'https://www.college-football-hq.com'
+    ],
+    methods: ['GET','POST'],
     allowedHeaders: ['Content-Type'] // Specify allowed headers
 }
 

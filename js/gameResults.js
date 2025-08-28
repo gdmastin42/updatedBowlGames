@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8000'
+const BASE_URL = ''
 
 fetch(`${BASE_URL}/api/game-results`)
     .then(response => response.json())

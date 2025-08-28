@@ -12,7 +12,7 @@ const PORT = 8000
 // Middleware
 const corsOptions = {
 origin: [
-        'http://127.0.0.1:5500', // Allow requests from your frontend
+        'http://127.0.0.1:5500',
         'https://localhost:5500',
         'https://college-football-hq.com',
         'https://www.college-football-hq.com'

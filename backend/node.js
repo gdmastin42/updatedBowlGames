@@ -151,21 +151,27 @@ app.post('/api/predictions', (req, res) => {
 })
 
 // Route to fetch leaderboard data
-app.get('/api/leaderboard', (req, res) => {
-    db.all(`
-        SELECT u.username, COUNT(p.predictionID) AS score
+const leaderboardQuery = `
+        SELECT u.username,
+            COUNT(p.prediction_id) AS score
         FROM tblUsers u
-        LEFT JOIN tblPredictions p ON u.userID = p.userID
+        LEFT JOIN tblPredictions p
+            ON p.userID = u.userID
         GROUP BY u.userID, u.username
-        ORDER BY score DESC
-    `, (err, rows) => {
+        ORDER BY score DESC, u.username ASC
+        LIMIT 100;
+    `;
+
+app.get('/api/leaderboard', (req, res) => {
+    db.all(leaderboardQuery, [], (err, rows) => {
         if (err) {
-            console.error('Database error:', err.message)
-            return res.status(500).json({ error: 'Database error.' })
+            console.error('Leaderboard error:', err);
+            return res.status(500).json({ error: 'Failed to load leaderboard' });
         }
-        res.json(rows)
-    })    
-})
+        res.json(rows || []);
+    });
+});
+
 
 // Route to fetch game results
 app.get('/api/gameResults', (req, res) => {

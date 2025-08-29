@@ -226,16 +226,18 @@ document.getElementById('frmPredictions')?.addEventListener('submit', (event) =>
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userID, predictions })
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data.error) {
-            Swal.fire('Error', data.error, 'error')
+    .then(res => res.json().then(data => ({ status: res.status, body: data })))
+    .then(({ status, body }) => {
+        if (status === 409) {
+            Swal.fire('Error', body.error, 'error'); // Already submitted
+        } else if (body.error) {
+            Swal.fire('Error', body.error, 'error');
         } else {
-            Swal.fire('Success', 'Predictions submitted successfully!', 'success')
+            Swal.fire('Success', 'Predictions submitted successfully!', 'success');
         }
     })
     .catch(err => {
-        console.error('Error during prediction submission:', err)
-        Swal.fire('Error', 'An unexpected error occurred.', 'error')
-    })
+        console.error('Error during prediction submission:', err);
+        Swal.fire('Error', 'An unexpected error occurred.', 'error');
+    });
 })

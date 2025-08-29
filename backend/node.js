@@ -121,34 +121,43 @@ app.post('/api/login', (req, res) => {
 
 // Route to handle predictions submission
 app.post('/api/predictions', (req, res) => {
-    const { userID, predictions } = req.body
+    const { userID, predictions } = req.body;
 
     if (!userID || !predictions) {
-        return res.status(400).json({ error: 'User ID and predictions are required.' })
+        return res.status(400).json({ error: 'User ID and predictions are required.' });
     }
 
-    const insertPrediction = db.prepare(`
-        INSERT INTO tblPredictions (prediction_id, userID, gameID, predictedWinner)
-        VALUES (?, ?, ?, ?)
-    `)
+    // Check if the user already submitted predictions
+    db.get('SELECT 1 FROM tblPredictions WHERE userID = ? LIMIT 1', [userID], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error.' });
+        }
 
-    db.serialize(() => {
-        predictions.forEach(({ gameID, predictedWinner }) => {
-            const predictionID = uuidv4() // Generate a UUID for prediction_id
-            insertPrediction.run(predictionID, userID, gameID, predictedWinner, (err) => {
-                if (err) {
-                    console.error('Error inserting prediction:', err.message)
-                }
-            })
-        })
-        insertPrediction.finalize((err) => {
-            if (err) {
-                return res.status(500).json({ error: 'Database error.' })
-            }
-            res.json({ message: 'Predictions saved successfully.' })
-        })
-    })
-})
+        if (row) {
+            // User already submitted
+            return res.status(409).json({ error: 'You already submitted your predictions.' });
+        }
+
+        // Continue with saving predictions
+        const insert = db.prepare(`
+            INSERT INTO tblPredictions (userID, gameID, predictedWinner)
+            VALUES (?, ?, ?)
+        `);
+
+        db.serialize(() => {
+            predictions.forEach(({ gameID, predictedWinner }) => {
+                insert.run(userID, gameID, predictedWinner, (err) => {
+                    if (err) console.error('Insert error:', err.message);
+                });
+            });
+
+            insert.finalize((err) => {
+                if (err) return res.status(500).json({ error: 'Database error during finalizing.' });
+                res.json({ message: 'Predictions submitted successfully.' });
+            });
+        });
+    });
+});
 
 // Route to fetch leaderboard data
 

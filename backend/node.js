@@ -151,16 +151,35 @@ app.post('/api/predictions', (req, res) => {
 })
 
 // Route to fetch leaderboard data
+
+// === Replace your current leaderboardQuery with the following ===
 const leaderboardQuery = `
-        SELECT u.username,
-            COUNT(p.prediction_id) AS score
-        FROM tblUsers u
-        LEFT JOIN tblPredictions p
-            ON p.userID = u.userID
-        GROUP BY u.userID, u.username
-        ORDER BY score DESC, u.username ASC
-        LIMIT 100;
-    `;
+    SELECT
+        u.username,
+        COUNT(*) AS score
+    FROM tblUsers u
+    LEFT JOIN tblPredictions p
+        ON p.userID = u.userID
+    LEFT JOIN tblBowlGames b
+        ON p.gameID = b.gameID
+    WHERE b.score IS NOT NULL
+        AND (
+            (
+                CAST(SUBSTR(b.score, 1, INSTR(b.score, '-') - 1) AS INTEGER) >
+                CAST(SUBSTR(b.score, INSTR(b.score, '-') + 1) AS INTEGER)
+                AND p.predictedWinner = b.team1
+            )
+            OR
+            (
+                CAST(SUBSTR(b.score, 1, INSTR(b.score, '-') - 1) AS INTEGER) <
+                CAST(SUBSTR(b.score, INSTR(b.score, '-') + 1) AS INTEGER)
+                AND p.predictedWinner = b.team2
+            )
+        )
+    GROUP BY u.userID, u.username
+    ORDER BY score DESC, u.username ASC
+    LIMIT 100;
+`
 
 app.get('/api/leaderboard', (req, res) => {
     db.all(leaderboardQuery, [], (err, rows) => {
@@ -171,6 +190,79 @@ app.get('/api/leaderboard', (req, res) => {
         res.json(rows || []);
     });
 });
+
+// === Add these routes near your other routes in node.js ===
+
+// Helper to sync scores from CollegeFootballData API
+async function syncScoresFromAPI(db) {
+    const apiKey = process.env.API_KEY
+    if (!apiKey) {
+        console.error('API key not set; cannot sync scores.')
+        return
+    }
+
+    try {
+        const { data } = await axios.get('https://api.collegefootballdata.com/games', {
+            params: {
+                year: 2024,
+                seasonType: 'postseason',
+                classification: 'fbs'
+            },
+            headers: { Authorization: `Bearer ${apiKey}` }
+        })
+
+        // Build a quick lookup: key = `${homeTeam}__${awayTeam}`, value = "home-away" score or null
+        const latest = new Map()
+        for (const g of data) {
+            if (!g.homeTeam || !g.awayTeam) continue
+            const score = (g.homePoints != null && g.awayPoints != null) ? `${g.homePoints}-${g.awayPoints}` : null
+            latest.set(`${g.homeTeam}__${g.awayTeam}`, score)
+        }
+
+        // Pull db games and update any scores we have
+        db.all('SELECT gameID, team1, team2 FROM tblBowlGames', (err, rows) => {
+            if (err) {
+                console.error('DB read for sync failed:', err.message)
+                return
+            }
+            const updateStmt = db.prepare('UPDATE tblBowlGames SET score = ? WHERE gameID = ?')
+
+            for (const row of rows) {
+                const key = `${row.team1}__${row.team2}`
+                if (latest.has(key)) {
+                    const newScore = latest.get(key) // may be null if game not finished yet
+                    updateStmt.run(newScore, row.gameID)
+                } else {
+                    // Try reversed key in case home/away flipped when you inserted locally
+                    const rkey = `${row.team2}__${row.team1}`
+                    if (latest.has(rkey)) {
+                        const revScore = latest.get(rkey)
+                        // If reversed, winner should still compute correctly since we compare by team names below.
+                        updateStmt.run(revScore, row.gameID)
+                    }
+                }
+            }
+
+            updateStmt.finalize((e) => {
+                if (e) console.error('Finalize updateStmt error:', e.message)
+                else console.log('Scores sync complete.')
+            })
+        })
+    } catch (e) {
+        console.error('Sync from API failed:', e.message)
+    }
+}
+
+// Manual trigger (you can hit this after deploying)
+app.post('/api/sync-scores', async (req, res) => {
+    await syncScoresFromAPI(db)
+    res.json({ message: 'Score sync triggered.' })
+})
+
+// Auto-sync every 15 minutes (adjust as you like)
+setInterval(() => {
+    syncScoresFromAPI(db)
+}, 15 * 60 * 1000)
 
 
 // Route to fetch game results

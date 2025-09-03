@@ -8,33 +8,68 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <!-- custom css -->
     <link href="/css/styles.css" rel="stylesheet">
+        <!-- DataTables CSS & JS -->
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 </head>
 <body class="bg-dark">
     <!-- Login Form -->
     <div class="container py-5">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4 rounded-4">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Bowl Predictions</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <!-- Other nav items can go here -->
+                        <li class="nav-item">
+                            <button id="btnAllPredictions" class="nav-link btn btn-link">All Predictions</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
         <div id="divLogin" class="card p-4 rounded-4 bg-light mx-auto" style="max-width: 500px;">
-        <h3 class="text-center mb-4">2024-25 Bowl Season Predictions</h3>
-        <form id="frmLogin">
-            <div class="mb-3">
-            <label for="txtFirstName" class="form-label">First Name</label>
-            <input type="text" id="txtFirstName" class="form-control" placeholder="John" required>
-            </div>
-
-            <div class="mb-3">
-            <label for="txtLastName" class="form-label">Last Name</label>
-            <input type="text" id="txtLastName" class="form-control" placeholder="Doe" required>
-            </div>
-
-            <button id="btnLogin" type="submit" class="btn btn-primary w-100 mt-3">Start Predictions</button>
-        </form>
+            <h3 class="text-center mb-4">2024-25 Bowl Season Predictions</h3>
+            <form id="frmLogin">
+                <div class="mb-3">
+                    <label for="txtFirstName" class="form-label">First Name</label>
+                    <input type="text" id="txtFirstName" class="form-control" placeholder="John" required>
+                </div>
+                <div class="mb-3">
+                    <label for="txtLastName" class="form-label">Last Name</label>
+                    <input type="text" id="txtLastName" class="form-control" placeholder="Doe" required>
+                </div>
+                <button id="btnLogin" type="submit" class="btn btn-primary w-100 mt-3">Start Predictions</button>
+            </form>
         </div>
     </div>
 
-    <!-- Bootstrap JS Bundle from CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- SweetAlert2 from CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Load login-specific JavaScript -->
-    <script src="/js/index.js"></script>
+        <!-- All Predictions Table Section (hidden by default) -->
+        <section id="allPredictionsSection" style="display:none; padding: 1rem;">
+            <h2>All Users’ Predictions</h2>
+            <table id="predictionsTable" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Game</th>
+                        <th>Team 1</th>
+                        <th>Team 2</th>
+                        <th>Predicted Winner</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+
+        <!-- Bootstrap JS Bundle from CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- SweetAlert2 from CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- Load login-specific JavaScript -->
+        <script src="/js/index.js"></script>
 </body>
 </html>

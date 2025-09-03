@@ -1,3 +1,37 @@
+// --- All Predictions DataTable logic ---
+let predictionsDataTable = null;
+
+async function loadAllPredictions() {
+    document.getElementById('allPredictionsSection').style.display = 'block';
+    if (predictionsDataTable) {
+        predictionsDataTable.ajax.reload(null, false);
+        return;
+    }
+    predictionsDataTable = new DataTable('#predictionsTable', {
+        ajax: {
+            url: '/api/predictions/full',
+            dataSrc: ''
+        },
+        columns: [
+            { data: 'username' },
+            { data: 'gameName' },
+            { data: 'team1' },
+            { data: 'team2' },
+            { data: 'predictedWinner' }
+        ],
+        pageLength: 25,
+        order: [[0, 'asc'], [1, 'asc']],
+        responsive: true
+    });
+}
+
+document.getElementById('btnAllPredictions')?.addEventListener('click', () => {
+    loadAllPredictions();
+    const navbarCollapse = document.querySelector('.navbar-collapse.show');
+    if (navbarCollapse) {
+        new bootstrap.Collapse(navbarCollapse).hide();
+    }
+});
 const BASE_URL = ''
 
 // Handle login form submission

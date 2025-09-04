@@ -166,6 +166,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('chartContainer').innerHTML = '';
     }) 
 
+    $('#chartModal').on('shown.bs.modal', function () {
+        $('.dataTable:visible').each(function () {
+            if ($.fn.DataTable.isDataTable(this)) {
+                $(this).DataTable().columns.adjust();
+            }
+        });
+    });
+
     const storedUsername = localStorage.getItem('username')
     if (storedUsername) {
         const formattedUsername = storedUsername.replace('_', ' ')

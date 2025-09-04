@@ -105,6 +105,52 @@ document.addEventListener('DOMContentLoaded', async () => {
         modal.show()
     })
     
+    document.getElementById('btnAllPredictions')?.addEventListener('click', async (event) => {
+        event.preventDefault();
+
+        // Clear previous modal content / chart
+        const container = document.getElementById('chartContainer');
+        container.innerHTML = '';
+        if (currentChart) { currentChart.destroy(); currentChart = null; }
+
+        // Build table skeleton
+        container.innerHTML = `
+            <table id="allPredictionsTable" class="display" style="width:100%">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Game</th>
+                  <th>Team 1</th>
+                  <th>Team 2</th>
+                  <th>Predicted Winner</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+        `;
+
+        // Initialize DataTable with server data
+        $('#allPredictionsTable').DataTable({
+          ajax: { url: `${BASE_URL}/api/predictions/full`, dataSrc: '' },
+          columns: [
+            { data: 'username' },
+            { data: 'gameName' },
+            { data: 'team1' },
+            { data: 'team2' },
+            { data: 'predictedWinner' }
+          ],
+          order: [[0, 'asc'], [1, 'asc']],
+          pageLength: 25,
+          lengthChange: false,
+          responsive: true
+        });
+
+        // Open the modal
+        document.getElementById('chartModalLabel').textContent = 'All Predictions';
+        const modal = new bootstrap.Modal(document.getElementById('chartModal'));
+        modal.show();
+    })
+    
     // Destroy chart and DataTables when modal is hidden
     $('#chartModal').on('hidden.bs.modal', function () {
         if (currentChart) { currentChart.destroy(); currentChart = null; }

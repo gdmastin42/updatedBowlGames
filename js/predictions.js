@@ -115,7 +115,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Build table skeleton
         container.innerHTML = `
-            <table id="allPredictionsTable" class="display" style="width:100%">
+          <div class="table-responsive">
+            <table id="allPredictionsTable" class="display table table-striped table-bordered w-100 nowrap">
               <thead>
                 <tr>
                   <th>User</th>
@@ -127,6 +128,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               </thead>
               <tbody></tbody>
             </table>
+          </div>
         `;
 
         // Initialize DataTable with server data
@@ -142,7 +144,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           order: [[0, 'asc'], [1, 'asc']],
           pageLength: 25,
           lengthChange: false,
-          responsive: true
+          responsive: true,
+          scrollX: true,
+          autoWidth: false
         });
 
         // Open the modal

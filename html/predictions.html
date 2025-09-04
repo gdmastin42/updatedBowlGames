@@ -9,6 +9,8 @@
 
   <!-- DataTables CSS -->
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+  <!-- DataTables Responsive CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
 
   <!-- Your custom CSS (keep local if not on CDN) -->
   <link href="/css/styles.css" rel="stylesheet">
@@ -43,14 +45,14 @@
 
   <!-- Modal for displaying charts -->
   <div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="chartModalLabel">Chart</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div id="chartContainer"></div>
+          <div id="chartContainer" class="table-responsive"></div>
         </div>
       </div>
     </div>
@@ -85,6 +87,11 @@
 
   <!-- DataTables JS -->
   <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+  <!-- DataTables Responsive JS -->
+  <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+  <style>
+    .dataTable td, .dataTable th { white-space: normal; word-break: break-word; }
+  </style>
 
   <!-- Your custom JS (keep local if not on CDN) -->
   <script src="/js/predictions.js"></script>

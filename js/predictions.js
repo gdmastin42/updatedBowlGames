@@ -113,41 +113,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.innerHTML = '';
         if (currentChart) { currentChart.destroy(); currentChart = null; }
 
-        // Build table skeleton
-        container.innerHTML = `
-          <div class="table-responsive">
-            <table id="allPredictionsTable" class="display table table-striped table-bordered w-100 nowrap">
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Game</th>
-                  <th>Team 1</th>
-                  <th>Team 2</th>
-                  <th>Predicted Winner</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        `;
+                // Build table skeleton
+                container.innerHTML = `
+                    <div class="table-responsive">
+                        <table id="allPredictionsTable" class="display table table-striped table-bordered w-100 nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Game</th>
+                                    <th>Prediction</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                `;
 
-        // Initialize DataTable with server data
-        $('#allPredictionsTable').DataTable({
-          ajax: { url: `${BASE_URL}/api/predictions/full`, dataSrc: '' },
-          columns: [
-            { data: 'username' },
-            { data: 'gameName' },
-            { data: 'team1' },
-            { data: 'team2' },
-            { data: 'predictedWinner' }
-          ],
-          order: [[0, 'asc'], [1, 'asc']],
-          pageLength: 25,
-          lengthChange: false,
-          responsive: true,
-          scrollX: true,
-          autoWidth: false
-        });
+                // Initialize DataTable with server data
+                $('#allPredictionsTable').DataTable({
+                    ajax: { url: `${BASE_URL}/api/predictions/full`, dataSrc: '' },
+                    columns: [
+                        { data: 'username', title: 'Username' },
+                        { data: 'gameName', title: 'Game' },
+                        { data: 'predictedWinner', title: 'Prediction' }
+                    ],
+                    order: [[0, 'asc'], [1, 'asc']],
+                    pageLength: 25,
+                    lengthChange: false,
+                    responsive: true,
+                    scrollX: true,
+                    autoWidth: false
+                });
 
         // Open the modal
         document.getElementById('chartModalLabel').textContent = 'All Predictions';

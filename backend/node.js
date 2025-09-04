@@ -388,6 +388,29 @@ app.delete('/api/bowlGames', (req, res) => {
     })
 })
 
+// Route to fetch all predictions with user and game info (for DataTable)
+app.get('/api/predictions/full' , (req, res) => {
+  const sql = `
+    SELECT 
+      u.username,
+      b.gameName,
+      b.team1,
+      b.team2,
+      p.predictedWinner
+    FROM tblPredictions p
+    INNER JOIN tblUsers u ON u.userID = p.userID
+    INNER JOIN tblBowlGames b ON b.gameID = p.gameID
+    ORDER BY u.username ASC, b.gameName ASC;
+  `;
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      console.error('Error fetching predictions:', err);
+      return res.status(500).json({ error: 'Failed to fetch predictions' });
+    }
+    res.json(rows || []);
+  });
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`)

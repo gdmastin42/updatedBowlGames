@@ -114,7 +114,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if ($.fn.DataTable.isDataTable('#gameResultsTable')) {
             $('#gameResultsTable').DataTable().destroy();
         }
-        document.getElementById('chartContainer').innerHTML = '';
+            if ($.fn.DataTable.isDataTable('#allPredictionsTable')) {
+                $('#allPredictionsTable').DataTable().destroy();
+            }
+            document.getElementById('chartContainer').innerHTML = '';
     }) 
 
     const storedUsername = localStorage.getItem('username')

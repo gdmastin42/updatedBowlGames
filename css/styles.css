@@ -135,7 +135,7 @@
   margin-right: 0.5rem;
 }
 
-@media (max-width: 991.98px) {
+/* @media (max-width: 991.98px) {
   .modal-xl {
     max-width: 90vw !important;
     margin: 0;
@@ -152,4 +152,4 @@
     width: 90% !important;
     min-width: 600px;
   }
-}
+} */

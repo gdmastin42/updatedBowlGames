@@ -113,38 +113,44 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.innerHTML = '';
         if (currentChart) { currentChart.destroy(); currentChart = null; }
 
-                // Build table skeleton
-                container.innerHTML = `
-          <div class="table-responsive">
-            <table id="allPredictionsTable" class="display table table-striped table-bordered w-100 nowrap">
-              <thead>
-                <tr>
-                  <th>Username</th>
-                  <th>Game</th>
-                  <th>Prediction</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+        // Build table skeleton with word-wrap style
+        container.innerHTML = `
+            <style>
+                #allPredictionsTable td {
+                    white-space: normal !important;
+                    word-break: break-word;
+                }
+            </style>
+            <div class="table-responsive">
+                <table id="allPredictionsTable" class="display table table-striped table-bordered w-100 nowrap">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Game</th>
+                            <th>Prediction</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         `;
 
         // Initialize DataTable with server data
         $('#allPredictionsTable').DataTable({
-          ajax: { url: `${BASE_URL}/api/predictions/full`, dataSrc: '' },
-          columns: [
-            { data: 'username', title: 'Username' },
-            { data: 'gameName', title: 'Game' },
-            { data: 'predictedWinner', title: 'Prediction' }
-          ],
-          paging: true,
-          pageLength: 10,
-          lengthChange: true,
-          ordering: true,
-          info: true,
-          responsive: false,
-          scrollX: true,
-          autoWidth: false
+            ajax: { url: `${BASE_URL}/api/predictions/full`, dataSrc: '' },
+            columns: [
+                { data: 'username', title: 'Username' },
+                { data: 'gameName', title: 'Game' },
+                { data: 'predictedWinner', title: 'Prediction' }
+            ],
+            paging: true,
+            pageLength: 10,
+            lengthChange: true,
+            ordering: true,
+            info: true,
+            responsive: false,
+            scrollX: true,
+            autoWidth: false
         });
 
         // Open the modal

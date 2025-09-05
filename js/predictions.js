@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.innerHTML = '';
         if (currentChart) { currentChart.destroy(); currentChart = null; }
 
-                // Build table skeleton with word-wrap style
+                // Build table skeleton with word-wrap style, remove nowrap
                 container.innerHTML = `
                     <style>
                         #allPredictionsTable td {
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         }
                     </style>
                     <div class="table-responsive">
-                        <table id="allPredictionsTable" class="display table table-striped table-bordered w-100 nowrap">
+                        <table id="allPredictionsTable" class="display table table-striped table-bordered w-100">
                             <thead>
                                 <tr>
                                     <th>User</th>
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                 `;
 
-                // Initialize DataTable with server data
+                // Initialize DataTable with Responsive, recalc on resize
                 $('#allPredictionsTable').DataTable({
                     ajax: { url: `${BASE_URL}/api/predictions/full`, dataSrc: '' },
                     columns: [
@@ -154,9 +154,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     lengthChange: true,
                     ordering: true,
                     info: true,
-                    responsive: false,
-                    scrollX: true,
-                    autoWidth: false
+                    responsive: true,
+                    scrollX: false,
+                    autoWidth: true,
+                    initComplete: function () {
+                        const api = this.api();
+                        $(window).on('resize.allPredictions', () => {
+                            api.columns.adjust().responsive.recalc();
+                        });
+                    }
                 });
 
         // Open the modal
@@ -181,9 +187,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }) 
 
     $('#chartModal').on('shown.bs.modal', function () {
-        if ($.fn.DataTable.isDataTable('#allPredictionsTable')) {
-            $('#allPredictionsTable').DataTable().columns.adjust();
-        }
+        // On modal show, recalc DataTables Responsive for All Predictions
+        const api = $.fn.DataTable.isDataTable('#allPredictionsTable') && $('#allPredictionsTable').DataTable();
+        if (api) api.columns.adjust().responsive.recalc();
+        // ...existing code for other tables...
+    });
+    // On modal hide, remove resize handler
+    $('#chartModal').on('hidden.bs.modal', function () {
+        $(window).off('resize.allPredictions');
     });
 
     const storedUsername = localStorage.getItem('username')

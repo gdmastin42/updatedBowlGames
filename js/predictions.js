@@ -181,11 +181,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }) 
 
     $('#chartModal').on('shown.bs.modal', function () {
-        $('.dataTable:visible').each(function () {
-            if ($.fn.DataTable.isDataTable(this)) {
-                $(this).DataTable().columns.adjust();
-            }
-        });
+        if ($.fn.DataTable.isDataTable('#allPredictionsTable')) {
+            $('#allPredictionsTable').DataTable().columns.adjust();
+        }
     });
 
     const storedUsername = localStorage.getItem('username')

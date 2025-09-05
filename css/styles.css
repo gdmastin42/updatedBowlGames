@@ -134,3 +134,22 @@
   object-fit: contain;
   margin-right: 0.5rem;
 }
+
+@media (max-width: 991.98px) {
+  .modal-xl {
+    max-width: 100vw !important;
+    margin: 0;
+  }
+  .modal-content {
+    border-radius: 0;
+  }
+  .table-responsive {
+    width: 100vw !important;
+    margin: 0;
+    padding: 0;
+  }
+  table.dataTable {
+    width: 100% !important;
+    min-width: 600px;
+  }
+}

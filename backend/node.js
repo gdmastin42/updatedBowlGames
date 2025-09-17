@@ -213,9 +213,11 @@ async function syncScoresFromAPI(db) {
     try {
         const { data } = await axios.get('https://api.collegefootballdata.com/games', {
             params: {
-                year: 2024,
-                seasonType: 'postseason',
-                classification: 'fbs'
+                year: 2025,
+                seasonType: 'regular',
+                classification: 'fbs',
+                week: '4',
+                conference: 'sec'
             },
             headers: { Authorization: `Bearer ${apiKey}` }
         })

@@ -320,7 +320,7 @@ app.get('/api/key', (req, res) => {
 })
 
 // Route to fetch and store last year's bowl games from CFBD
-app.get('/api/fetch-sec-week4', async (req, res) => {
+app.get('/api/fetch-bowl-games', async (req, res) => {
     const apiKey = process.env.API_KEY;
     if (!apiKey) return res.status(500).json({ error: 'API key not set' });
 

@@ -271,10 +271,7 @@ app.post('/api/sync-scores', async (req, res) => {
 })
 
 // Auto-sync every 15 minutes (adjust as you like)
-setInterval(() => {
-    syncScoresFromAPI(db)
-}, 15 * 60 * 1000)
-
+setInterval(() => syncScoresFromAPI(db), 7 * 24 * 60 * 60 * 1000) // once per week
 
 // Route to fetch game results
 app.get('/api/gameResults', (req, res) => {

@@ -1,3 +1,52 @@
+// Endpoint to fetch and insert 2025 SEC Week 4 games
+app.post('/api/fetch-week4-sec', async (req, res) => {
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) return res.status(500).json({ error: 'API key not set' });
+
+    try {
+        const response = await axios.get('https://api.collegefootballdata.com/games', {
+            params: {
+                year: 2025,
+                seasonType: 'regular',
+                classification: 'fbs',
+                week: '4',
+                conference: 'sec'
+            },
+            headers: {
+                Authorization: `Bearer ${apiKey}`
+            }
+        });
+
+        const games = response.data.filter(game => game.homeTeam && game.awayTeam);
+        const stmt = db.prepare(`
+            INSERT OR IGNORE INTO tblBowlGames (gameID, gameName, team1, team2, type, score)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `);
+
+        games.forEach(game => {
+            const score = (game.homePoints !== null && game.awayPoints !== null)
+                ? `${game.homePoints}-${game.awayPoints}`
+                : null;
+
+            const gameName = `${game.awayTeam} at ${game.homeTeam} (SEC Week 4)`;
+
+            stmt.run(
+                uuidv4(),
+                gameName,
+                game.awayTeam,
+                game.homeTeam,
+                'regular',
+                score
+            );
+        });
+
+        stmt.finalize();
+        res.json({ message: 'SEC Week 4 games loaded successfully.' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch SEC games from API.' });
+    }
+});
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')

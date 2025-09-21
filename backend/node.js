@@ -338,7 +338,7 @@ app.get('/api/fetch-bowl-games', async (req, res) => {
                 year: 2025,
                 seasonType: 'regular',
                 classification: 'fbs',
-                week: 4,
+                week: 5,
                 conference: 'sec'
             },
             headers: {

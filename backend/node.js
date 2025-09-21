@@ -271,7 +271,18 @@ app.post('/api/sync-scores', async (req, res) => {
 })
 
 // Auto-sync every 15 minutes (adjust as you like)
-setInterval(() => syncScoresFromAPI(db), 7 * 24 * 60 * 60 * 1000) // once per week
+// Schedule syncScoresFromAPI to run once per day at midnight
+function scheduleDailyMidnightSync() {
+    const now = new Date();
+    const nextMidnight = new Date(now);
+    nextMidnight.setHours(24, 0, 0, 0); // set to next midnight
+    const msUntilMidnight = nextMidnight - now;
+    setTimeout(() => {
+        syncScoresFromAPI(db);
+        setInterval(() => syncScoresFromAPI(db), 24 * 60 * 60 * 1000); // every 24 hours
+    }, msUntilMidnight);
+}
+scheduleDailyMidnightSync();
 
 // Route to fetch game results
 app.get('/api/gameResults', (req, res) => {

@@ -10,6 +10,65 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     generateBowlGameCards(bowlGames, teamLogos)
 
+    // Username logic (must be before admin button logic)
+    // Username logic (must be before admin button logic)
+    // (already declared above)
+    if (storedUsername) {
+        const formattedUsername = storedUsername.replace('_', ' ')
+        const usernameElement = document.getElementById('txtUsername')
+        if (usernameElement) {
+            usernameElement.textContent = formattedUsername
+        }
+    } else {
+        window.location.href = 'index.html'
+    }
+
+    // === Admin-only "Update Scores" button (visible only to garrett mastin) ===
+    const syncBtn = document.getElementById('btnSyncScores');
+    if (syncBtn) {
+        if (storedUsername === 'garrett_mastin') {
+            syncBtn.classList.remove('d-none');
+        } else {
+            // Hide permanently if not the admin user
+            syncBtn.remove();
+        }
+
+        syncBtn.addEventListener('click', async (event) => {
+            event.preventDefault();
+            const confirm = await Swal.fire({
+                title: 'Update Scores?',
+                text: 'This will fetch the latest scores and update results. Proceed?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, update',
+                cancelButtonText: 'Cancel',
+            });
+            if (!confirm.isConfirmed) return;
+
+            // Show a loading state while syncing
+            await Swal.fire({
+                title: 'Syncing scores...',
+                html: 'Contacting the server to update the latest results.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/sync-scores`, { method: 'POST' });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || data.error) {
+                    throw new Error(data.error || `Server responded with status ${res.status}`);
+                }
+                await Swal.fire('Success', 'Scores have been updated!', 'success');
+            } catch (err) {
+                console.error('Failed to sync scores:', err);
+                await Swal.fire('Error', err?.message || 'Failed to sync scores.', 'error');
+            }
+        });
+    }
+
     document.getElementById('btnViewLeaderboard')?.addEventListener('click', async (event) => {
         event.preventDefault();
 

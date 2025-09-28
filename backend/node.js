@@ -216,7 +216,7 @@ async function syncScoresFromAPI(db) {
                 year: 2025,
                 seasonType: 'regular',
                 classification: 'fbs',
-                week: '4',
+                week: '5',
                 conference: 'sec'
             },
             headers: { Authorization: `Bearer ${apiKey}` }
@@ -348,7 +348,7 @@ app.get('/api/fetch-bowl-games', async (req, res) => {
 
         const games = response.data.filter(game => game.homeTeam && game.awayTeam);
         if (games.length === 0) {
-            return res.status(404).json({ message: 'No SEC games found for Week 4.' });
+            return res.status(404).json({ message: 'No SEC games found for Week 5.' });
         }
 
         const stmt = db.prepare(`
@@ -362,7 +362,7 @@ app.get('/api/fetch-bowl-games', async (req, res) => {
                 ? `${game.homePoints}-${game.awayPoints}`
                 : null;
 
-            const gameName = `${game.awayTeam} at ${game.homeTeam} (SEC Week 4)`;
+            const gameName = `${game.awayTeam} at ${game.homeTeam} (SEC Week 5)`;
 
             stmt.run(
                 uuidv4(),
@@ -375,7 +375,7 @@ app.get('/api/fetch-bowl-games', async (req, res) => {
         });
 
         stmt.finalize();
-        res.json({ message: 'SEC Week 4 games loaded successfully.' });
+        res.json({ message: 'SEC Week 5 games loaded successfully.' });
 
     } catch (err) {
         console.error(err);

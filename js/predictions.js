@@ -1,3 +1,18 @@
+    // Update Scores button handler
+    document.getElementById('btnUpdateScores')?.addEventListener('click', async (event) => {
+        event.preventDefault();
+        try {
+            const resp = await fetch(`${BASE_URL}/api/sync-scores`, { method: 'POST' });
+            const data = await resp.json();
+            if (resp.ok) {
+                Swal.fire('Success', data.message || 'Scores updated successfully.', 'success');
+            } else {
+                Swal.fire('Error', data.error || 'Failed to update scores.', 'error');
+            }
+        } catch (err) {
+            Swal.fire('Error', 'An error occurred while updating scores.', 'error');
+        }
+    });
 const BASE_URL = ''
 let currentChart = null
 

@@ -213,9 +213,11 @@ async function syncScoresFromAPI(db) {
     try {
         const { data } = await axios.get('https://api.collegefootballdata.com/games', {
             params: {
-                year: 2024,
-                seasonType: 'postseason',
-                classification: 'fbs'
+                year: 2025,
+                seasonType: 'regular',
+                classification: 'fbs',
+                week: '5',
+                conference: 'sec'
             },
             headers: { Authorization: `Bearer ${apiKey}` }
         })
@@ -269,10 +271,18 @@ app.post('/api/sync-scores', async (req, res) => {
 })
 
 // Auto-sync every 15 minutes (adjust as you like)
-setInterval(() => {
-    syncScoresFromAPI(db)
-}, 15 * 60 * 1000)
-
+// Schedule syncScoresFromAPI to run once per day at midnight
+function scheduleDailyMidnightSync() {
+    const now = new Date();
+    const nextMidnight = new Date(now);
+    nextMidnight.setHours(24, 0, 0, 0); // set to next midnight
+    const msUntilMidnight = nextMidnight - now;
+    setTimeout(() => {
+        syncScoresFromAPI(db);
+        setInterval(() => syncScoresFromAPI(db), 24 * 60 * 60 * 1000); // every 24 hours
+    }, msUntilMidnight);
+}
+scheduleDailyMidnightSync();
 
 // Route to fetch game results
 app.get('/api/gameResults', (req, res) => {
@@ -319,54 +329,59 @@ app.get('/api/key', (req, res) => {
 
 // Route to fetch and store last year's bowl games from CFBD
 app.get('/api/fetch-bowl-games', async (req, res) => {
-    db.get('SELECT COUNT(*) as count FROM tblBowlGames', async (err, row) => {
-        if (err) return res.status(500).json({ error: 'Database error.' })
-        if (row.count > 0) {
-            return res.json({ message: 'Bowl games already loaded.' })
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) return res.status(500).json({ error: 'API key not set' });
+
+    try {
+        const response = await axios.get('https://api.collegefootballdata.com/games', {
+            params: {
+                year: 2025,
+                seasonType: 'regular',
+                classification: 'fbs',
+                week: 5,
+                conference: 'sec'
+            },
+            headers: {
+                Authorization: `Bearer ${apiKey}`
+            }
+        });
+
+        const games = response.data.filter(game => game.homeTeam && game.awayTeam);
+        if (games.length === 0) {
+            return res.status(404).json({ message: 'No SEC games found for Week 5.' });
         }
 
-        const apiKey = process.env.API_KEY
-        if (!apiKey) return res.status(500).json({ error: 'API key not set' })
+        const stmt = db.prepare(`
+            INSERT OR IGNORE INTO tblBowlGames
+            (gameID, gameName, team1, team2, type, score)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `);
 
-        try {
-            const response = await axios.get('https://api.collegefootballdata.com/games', {
-                params: {
-                    year: 2024,
-                    seasonType: 'postseason',
-                    classification: 'fbs'
-                },
-                headers: {
-                    Authorization: `Bearer ${apiKey}`
-                }
-            })
+        games.forEach(game => {
+            const score = (game.homePoints !== null && game.awayPoints !== null)
+                ? `${game.homePoints}-${game.awayPoints}`
+                : null;
 
-            const games = response.data.filter(game => game.homeTeam && game.awayTeam)
-            const stmt = db.prepare(`INSERT OR IGNORE INTO tblBowlGames (gameID, gameName, team1, team2, type, score) VALUES (?, ?, ?, ?, ?, ?)`)
+            const gameName = `${game.awayTeam} at ${game.homeTeam} (SEC Week 5)`;
 
-            games.forEach(game => {
-                const type = game.venue && game.venue.includes("Rose Bowl") ? "semifinal" : "traditional"
-                const score = (game.homePoints !== null && game.awayPoints !== null)
-                    ? `${game.homePoints}-${game.awayPoints}`
-                    : null
+            stmt.run(
+                uuidv4(),
+                gameName,
+                game.homeTeam, // team1 = home
+                game.awayTeam, // team2 = away
+                'regular',
+                score
+            );
+        });
 
-                stmt.run(
-                    uuidv4(),
-                    game.notes || game.venue || "Bowl Game",
-                    game.homeTeam,
-                    game.awayTeam,
-                    type,
-                    score
-                )
-            })
+        stmt.finalize();
+        res.json({ message: 'SEC Week 5 games loaded successfully.' });
 
-            stmt.finalize()
-            res.json({ message: 'Bowl games loaded successfully.' })
-        } catch (err) {
-            console.error(err)
-            res.status(500).json({ error: 'Failed to fetch games from API.' })
-        }
-    })
-})
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch games from API.' });
+    }
+});
 
 // Route to fetch all bowl games
 app.get('/api/bowlGames', (req, res) => {

@@ -1,3 +1,18 @@
+    // Update Scores button handler
+    document.getElementById('btnUpdateScores')?.addEventListener('click', async (event) => {
+        event.preventDefault();
+        try {
+            const resp = await fetch(`${BASE_URL}/api/sync-scores`, { method: 'POST' });
+            const data = await resp.json();
+            if (resp.ok) {
+                Swal.fire('Success', data.message || 'Scores updated successfully.', 'success');
+            } else {
+                Swal.fire('Error', data.error || 'Failed to update scores.', 'error');
+            }
+        } catch (err) {
+            Swal.fire('Error', 'An error occurred while updating scores.', 'error');
+        }
+    });
 const BASE_URL = ''
 let currentChart = null
 
@@ -120,6 +135,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                             white-space: normal !important;
                             word-break: break-word;
                         }
+                        .prediction-correct { background-color: #d4edda !important; color: #155724; }
+                        .prediction-wrong { background-color: #f8d7da !important; color: #721c24; }
                     </style>
                     <div class="table-responsive">
                         <table id="allPredictionsTable" class="display table table-striped table-bordered w-100">
@@ -135,6 +152,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                 `;
 
+                // Fetch game results to determine correct predictions
+                const resultsResp = await fetch(`${BASE_URL}/api/gameResults`);
+                const results = await resultsResp.json();
+                // Map: gameName -> winner
+                const gameWinners = {};
+                results.forEach(g => { if (g.game && g.winner) gameWinners[g.game] = g.winner; });
+
                 // Initialize DataTable with Responsive, recalc on resize
                 $('#allPredictionsTable').DataTable({
                     ajax: { url: `${BASE_URL}/api/predictions/full`, dataSrc: '' },
@@ -147,7 +171,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                             }
                         },
                         { data: 'gameName', title: 'Game' },
-                        { data: 'predictedWinner', title: 'Prediction' }
+                        {
+                            data: 'predictedWinner',
+                            title: 'Prediction',
+                            render: function(data, type, row) {
+                                const winner = gameWinners[row.gameName];
+                                if (!winner || !data) return data;
+                                if (data === winner) {
+                                    return `<span class="prediction-correct">${data}</span>`;
+                                } else {
+                                    return `<span class="prediction-wrong">${data}</span>`;
+                                }
+                            }
+                        }
                     ],
                     paging: true,
                     pageLength: 10,
@@ -203,6 +239,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const usernameElement = document.getElementById('txtUsername')
         if (usernameElement) {
             usernameElement.textContent = formattedUsername
+        }
+        // Show Update Scores button only for garrett_mastin
+        if (storedUsername === 'garrett_mastin') {
+            const updateBtn = document.getElementById('btnUpdateScores');
+            if (updateBtn) {
+                updateBtn.style.display = '';
+            }
         }
     } else {
         window.location.href = 'index.html'

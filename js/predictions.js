@@ -240,11 +240,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (usernameElement) {
             usernameElement.textContent = formattedUsername
         }
-            // Show Update Scores button only for garrett_mastin
-            if (storedUsername === 'garrett_mastin') {
-                const updateBtn = document.getElementById('btnUpdateScores');
-                if (updateBtn) updateBtn.style.display = '';
+        // Show Update Scores button only for garrett_mastin
+        if (storedUsername === 'garrett_mastin') {
+            const updateBtn = document.getElementById('btnUpdateScores');
+            if (updateBtn) {
+                updateBtn.style.display = '';
             }
+        }
     } else {
         window.location.href = 'index.html'
     }

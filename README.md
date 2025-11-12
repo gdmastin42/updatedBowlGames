@@ -1,4 +1,4 @@
-# 2024-25 Bowl Season Predictions
+# 2024-25 Bowl Season Predictions Website
 
 This is a full-stack web application that allows users to log in, make predictions for college football bowl games, and track progress on a leaderboard. Game data is pulled from the CollegeFootballData.com API and stored in a SQLite database.
  **Live Site Hosted on AWS Lightsail**

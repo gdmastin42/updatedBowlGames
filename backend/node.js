@@ -58,25 +58,25 @@ const db = new sqlite3.Database('./database/bowlGames.db', (err) => {
             )
         `)
 
-        db.all('SELECT * FROM tblBowlGames', (err, rows) => {
-            if (err) {
-                console.error('Error fetching games:', err.message)
-                return
-            }
+        // db.all('SELECT * FROM tblBowlGames', (err, rows) => {
+        //     if (err) {
+        //         console.error('Error fetching games:', err.message)
+        //         return
+        //     }
 
-            rows.forEach((row) => {
-                const newGameID = uuidv4()
-                db.run(
-                    'UPDATE tblBowlGames SET gameID = ? WHERE gameID = ?',
-                    [newGameID, row.gameID],
-                    (err) => {
-                        if (err) {
-                            console.error('Error updating gameID:', err.message)
-                        }
-                    }
-                )
-            })
-        })
+        //     rows.forEach((row) => {
+        //         const newGameID = uuidv4()
+        //         db.run(
+        //             'UPDATE tblBowlGames SET gameID = ? WHERE gameID = ?',
+        //             [newGameID, row.gameID],
+        //             (err) => {
+        //                 if (err) {
+        //                     console.error('Error updating gameID:', err.message)
+        //                 }
+        //             }
+        //         )
+        //     })
+        // })
 
         // Auto-load bowl games on server start (optional)
         axios.get('http://localhost:8000/api/fetch-bowl-games')
@@ -216,7 +216,7 @@ async function syncScoresFromAPI(db) {
                 year: 2025,
                 seasonType: 'postseason',
                 classification: 'fbs',
-                week: '17',
+                week: '17'
             },
             headers: { Authorization: `Bearer ${apiKey}` }
         })
@@ -335,10 +335,9 @@ app.get('/api/fetch-bowl-games', async (req, res) => {
         const response = await axios.get('https://api.collegefootballdata.com/games', {
             params: {
                 year: 2025,
-                seasonType: 'regular',
+                seasonType: 'postseason',
                 classification: 'fbs',
-                week: 5,
-                conference: 'sec'
+                week: 17
             },
             headers: {
                 Authorization: `Bearer ${apiKey}`
@@ -347,7 +346,7 @@ app.get('/api/fetch-bowl-games', async (req, res) => {
 
         const games = response.data.filter(game => game.homeTeam && game.awayTeam);
         if (games.length === 0) {
-            return res.status(404).json({ message: 'No SEC games found for Week 5.' });
+            return res.status(404).json({ message: 'No games found.' });
         }
 
         const stmt = db.prepare(`
@@ -361,20 +360,20 @@ app.get('/api/fetch-bowl-games', async (req, res) => {
                 ? `${game.homePoints}-${game.awayPoints}`
                 : null;
 
-            const gameName = `${game.awayTeam} at ${game.homeTeam} (SEC Week 5)`;
+            const gameName = `${game.awayTeam} at ${game.homeTeam}`;
 
             stmt.run(
                 uuidv4(),
                 gameName,
                 game.homeTeam, // team1 = home
                 game.awayTeam, // team2 = away
-                'regular',
+                'postseason',
                 score
             );
         });
 
         stmt.finalize();
-        res.json({ message: 'SEC Week 5 games loaded successfully.' });
+        res.json({ message: 'Postseason games loaded successfully.' });
 
     } catch (err) {
         console.error(err);

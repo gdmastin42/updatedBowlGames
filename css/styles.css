@@ -218,7 +218,7 @@ body.bg-dark {
     background: rgba(255,255,255,0.25) !important;
     color: white !important;
 }
-#chartModal .modal-content {
+/* #chartModal .modal-content {
     background: linear-gradient(135deg, #f0f2f5, #e6e8eb, #dbdde0) !important;
     color: black !important;
-}
+} */

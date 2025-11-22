@@ -214,9 +214,9 @@ async function syncScoresFromAPI(db) {
         const { data } = await axios.get('https://api.collegefootballdata.com/games', {
             params: {
                 year: 2025,
-                seasonType: 'postseason',
+                seasonType: 'regular',
                 classification: 'fbs',
-                week: '17'
+                week: '14'
             },
             headers: { Authorization: `Bearer ${apiKey}` }
         })
@@ -335,9 +335,9 @@ app.get('/api/fetch-bowl-games', async (req, res) => {
         const response = await axios.get('https://api.collegefootballdata.com/games', {
             params: {
                 year: 2025,
-                seasonType: 'postseason',
+                seasonType: 'regular',
                 classification: 'fbs',
-                week: 17
+                week: 14
             },
             headers: {
                 Authorization: `Bearer ${apiKey}`
@@ -367,7 +367,7 @@ app.get('/api/fetch-bowl-games', async (req, res) => {
                 gameName,
                 game.homeTeam, // team1 = home
                 game.awayTeam, // team2 = away
-                'postseason',
+                'regular',
                 score
             );
         });

@@ -111,11 +111,3 @@ body.bg-dark {
     background: rgba(0,0,0,0.15) !important;
     color: black !important;
 }
-
-/* input[type="search"]::-webkit-search-cancel-button {
-    filter: invert(0);
-    opacity: 0.6;
-}
-input[type="search"]::-moz-search-clear {
-    filter: invert(0);
-} */

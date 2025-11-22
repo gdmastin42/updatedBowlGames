@@ -1,7 +1,10 @@
 .game-card {
-    transition: all 0.3s ease;
-    padding: 1rem; /* Add this for internal spacing */
+    background: linear-gradient(135deg, #f0f2f5, #e6e8eb, #dbdde0);
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    padding: 1rem;
 }
+
 
 .game-card:hover {
     transform: translateY(-5px);

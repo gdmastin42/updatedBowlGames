@@ -200,8 +200,6 @@ app.get('/api/leaderboard', (req, res) => {
     });
 });
 
-// === Add these routes near your other routes in node.js ===
-
 // Helper to sync scores from CollegeFootballData API
 async function syncScoresFromAPI(db) {
     const apiKey = process.env.API_KEY
@@ -216,7 +214,7 @@ async function syncScoresFromAPI(db) {
                 year: 2025,
                 seasonType: 'regular',
                 classification: 'fbs',
-                week: '14'
+                week: '13'
             },
             headers: { Authorization: `Bearer ${apiKey}` }
         })
@@ -337,7 +335,7 @@ app.get('/api/fetch-bowl-games', async (req, res) => {
                 year: 2025,
                 seasonType: 'regular',
                 classification: 'fbs',
-                week: 14
+                week: 13
             },
             headers: {
                 Authorization: `Bearer ${apiKey}`

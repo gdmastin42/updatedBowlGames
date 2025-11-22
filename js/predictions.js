@@ -226,7 +226,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // On modal show, recalc DataTables Responsive for All Predictions
         const api = $.fn.DataTable.isDataTable('#allPredictionsTable') && $('#allPredictionsTable').DataTable();
         if (api) api.columns.adjust().responsive.recalc();
-        // ...existing code for other tables...
     });
     // On modal hide, remove resize handler
     $('#chartModal').on('hidden.bs.modal', function () {
@@ -356,7 +355,7 @@ document.getElementById('frmPredictions')?.addEventListener('submit', (event) =>
     .then(res => res.json().then(data => ({ status: res.status, body: data })))
     .then(({ status, body }) => {
         if (status === 409) {
-            Swal.fire('Error', body.error, 'error'); // Already submitted
+            Swal.fire('Error', body.error, 'error');
         } else if (body.error) {
             Swal.fire('Error', body.error, 'error');
         } else {

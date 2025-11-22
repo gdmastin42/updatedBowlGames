@@ -153,3 +153,55 @@
     min-width: 600px;
   }
 } */
+
+body.bg-dark {
+    background: linear-gradient(135deg, #000000, #060b1a, #0f1b33);
+    background-attachment: fixed;
+    color: white;
+}
+
+/* Blue gradient for primary buttons */
+.btn-primary {
+    background: linear-gradient(135deg, #007bff, #0056d2);
+    border: none;
+}
+.btn-primary:hover {
+    background: linear-gradient(135deg, #3395ff, #0045a8);
+}
+
+/* Green gradient for success buttons */
+.btn-success {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    border: none;
+}
+.btn-success:hover {
+    background: linear-gradient(135deg, #39c15c, #19692c);
+}
+
+/* Yellow gradient for warning buttons */
+.btn-warning {
+    background: linear-gradient(135deg, #f6c23e, #d39e00);
+    border: none;
+}
+.btn-warning:hover {
+    background: linear-gradient(135deg, #ffd45c, #b78300);
+}
+
+/* Glossy button effect */
+.btn {
+    color: white !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    transition: 0.3s ease-in-out;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+}
+
+#divLogin {
+    background: linear-gradient(135deg, #f0f2f5, #e6e8eb, #dbdde0);
+    color: #000;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.45);
+    border-radius: 1rem;
+}

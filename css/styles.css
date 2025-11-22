@@ -5,138 +5,26 @@
     padding: 1rem;
 }
 
-
 .game-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
-.playoff-game {
-    border-left: 4px solid #ffc107;
-}
-
-.semifinal-game {
-    border-left: 4px solid #fd7e14;
-}
-
-.championship-game {
-    border-left: 4px solid #dc3545;
-}
+.playoff-game { border-left: 4px solid #ffc107; }
+.semifinal-game { border-left: 4px solid #fd7e14; }
+.championship-game { border-left: 4px solid #dc3545; }
 
 .form-check-input {
-    border: 2px solid black; /* Add a black outline */
-    width: 20px; /* Adjust size for better visibility */
-    height: 20px; /* Adjust size for better visibility */
-    margin-top: 0.3rem; /* Align with labels */
+    border: 2px solid black;
+    width: 20px;
+    height: 20px;
+    margin-top: 0.3rem;
 }
-
 .form-check-input:checked {
-    background-color: #0d6efd; /* Optional: Add a blue fill when selected */
-    border-color: #0d6efd; /* Optional: Change border color when selected */
+    background-color: #0d6efd;
+    border-color: #0d6efd;
 }
 
-.bracket-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 2rem;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-}
-.bracket-round {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    min-width: 180px;
-}
-.bracket-matchup {
-    border-left: 2px solid gold;
-    padding-left: 16px;
-    margin-bottom: 2.5rem;
-    position: relative;
-}
-.bracket-matchup:not(:last-child)::after {
-    content: "";
-    position: absolute;
-    left: -2px;
-    top: 100%;
-    width: 0;
-    height: 2.5rem;
-    border-left: 2px solid gold;
-}
-.team {
-    display: flex;
-    align-items: center;
-    font-weight: bold;
-    color: rgb(0, 0, 0);
-    margin-bottom: 0.5rem;
-}
-.bracket-advance {
-    color: #000000;
-    font-weight: normal;
-    font-style: italic;
-}
-@media (max-width: 900px) {
-    .bracket-container {
-        flex-direction: column;
-        align-items: center;
-    }
-    .bracket-round {
-        min-width: unset;
-        width: 100%;
-    }
-}
-
-.custom-dropdown {
-  position: relative;
-  width: 200px;
-  margin-top: 8px;
-  cursor: pointer;
-}
-.dropdown-selected {
-  background: #fff;
-  border: 1px solid #ccc;
-  padding: 8px;
-  border-radius: 4px;
-  color: #222;
-}
-.dropdown-list {
-  display: none;
-  position: absolute;
-  background: #fff;
-  border: 1px solid #ccc;
-  width: 100%;
-  z-index: 10;
-  border-radius: 4px;
-  max-height: 200px;
-  overflow-y: auto;
-}
-.custom-dropdown.open .dropdown-list {
-  display: block;
-}
-.dropdown-item, .dropdown-selected {
-  display: flex;
-  align-items: center;
-  font-weight: bold;
-  color: #222;
-  min-height: 50px;
-  font-size: 1rem;
-}
-.dropdown-item {
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  color: #222;
-}
-.dropdown-item:hover {
-  background: #eee;
-}
-.dropdown-item img, .dropdown-selected img {
-  width: 50px;
-  height: 50px;
-  object-fit: contain;
-  margin-right: 0.5rem;
-}
 body.bg-dark {
     background: linear-gradient(135deg, #000000, #060b1a, #0f1b33);
     background-attachment: fixed;
@@ -172,7 +60,6 @@ body.bg-dark {
     box-shadow: 0 3px 10px rgba(0,0,0,0.25);
     transition: 0.3s ease-in-out;
 }
-
 .btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 14px rgba(0,0,0,0.35);
@@ -188,24 +75,29 @@ body.bg-dark {
 #chartModal .modal-content {
     background: #1b1f2b !important;
     color: white !important;
+    border-radius: 1rem;
 }
 
-#chartModal table.dataTable th,
-#chartModal table.dataTable td {
+#chartModal table {
+    background: transparent !important;
     color: white !important;
 }
 
-#chartModal table.dataTable tbody tr {
-    background-color: rgba(255,255,255,0.05) !important;
-}
-
-#chartModal table.dataTable tbody tr:hover {
-    background-color: rgba(255,255,255,0.15) !important;
-}
-
-#chartModal table.dataTable thead th {
-    background-color: rgba(255,255,255,0.1) !important;
+#chartModal table th {
+    background: rgba(255,255,255,0.08) !important;
     color: white !important;
+}
+
+#chartModal table td {
+    color: white !important;
+}
+
+#chartModal table tr {
+    background-color: rgba(255,255,255,0.04) !important;
+}
+
+#chartModal table tr:hover {
+    background-color: rgba(255,255,255,0.12) !important;
 }
 
 #chartModal .dataTables_paginate .paginate_button {
@@ -213,12 +105,15 @@ body.bg-dark {
     color: white !important;
     border: 1px solid rgba(255,255,255,0.25) !important;
 }
-
 #chartModal .dataTables_paginate .paginate_button.current {
     background: rgba(255,255,255,0.25) !important;
     color: white !important;
 }
-/* #chartModal .modal-content {
-    background: linear-gradient(135deg, #f0f2f5, #e6e8eb, #dbdde0) !important;
-    color: black !important;
-} */
+
+input[type="search"]::-webkit-search-cancel-button {
+    filter: invert(1);
+    opacity: 1;
+}
+input[type="search"]::-moz-search-clear {
+    filter: invert(1);
+}

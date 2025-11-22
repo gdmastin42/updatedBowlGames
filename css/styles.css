@@ -73,47 +73,49 @@ body.bg-dark {
 }
 
 #chartModal .modal-content {
-    background: #1b1f2b !important;
-    color: white !important;
+    background: linear-gradient(135deg, #f0f2f5, #e6e8eb, #dbdde0) !important;
+    color: black !important;
     border-radius: 1rem;
 }
 
 #chartModal table {
     background: transparent !important;
-    color: white !important;
+    color: black !important;
 }
 
 #chartModal table th {
-    background: rgba(255,255,255,0.08) !important;
-    color: white !important;
+    background: rgba(0,0,0,0.1) !important;
+    color: black !important;
+    font-weight: 600;
 }
 
 #chartModal table td {
-    color: white !important;
+    color: black !important;
 }
 
 #chartModal table tr {
-    background-color: rgba(255,255,255,0.04) !important;
+    background-color: rgba(255,255,255,0.6) !important;
 }
 
 #chartModal table tr:hover {
-    background-color: rgba(255,255,255,0.12) !important;
+    background-color: rgba(255,255,255,0.85) !important;
 }
 
 #chartModal .dataTables_paginate .paginate_button {
-    background: rgba(255,255,255,0.1) !important;
-    color: white !important;
-    border: 1px solid rgba(255,255,255,0.25) !important;
-}
-#chartModal .dataTables_paginate .paginate_button.current {
-    background: rgba(255,255,255,0.25) !important;
-    color: white !important;
+    background: rgba(0,0,0,0.05) !important;
+    color: black !important;
+    border: 1px solid rgba(0,0,0,0.25) !important;
 }
 
-input[type="search"]::-webkit-search-cancel-button {
-    filter: invert(1);
-    opacity: 1;
+#chartModal .dataTables_paginate .paginate_button.current {
+    background: rgba(0,0,0,0.15) !important;
+    color: black !important;
+}
+
+/* input[type="search"]::-webkit-search-cancel-button {
+    filter: invert(0);
+    opacity: 0.6;
 }
 input[type="search"]::-moz-search-clear {
-    filter: invert(1);
-}
+    filter: invert(0);
+} */

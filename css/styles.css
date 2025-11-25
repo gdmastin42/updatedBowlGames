@@ -111,3 +111,36 @@ body.bg-dark {
     background: rgba(0,0,0,0.15) !important;
     color: black !important;
 }
+.bracket-round {
+    border-left: 4px solid #0d6efd;
+    padding-left: 15px;
+    margin-bottom: 40px;
+}
+
+.team-card {
+    background: rgba(255,255,255,0.8);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 12px;
+    color: black;
+}
+
+.team-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.team-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: contain;
+    background: #fff;
+    padding: 2px;
+}
+
+.team-card input {
+    transform: scale(1.2);
+    margin-right: 10px;
+}

@@ -1,4 +1,5 @@
 const BASE_URL = '';
+const PLACEHOLDER_LOGO = "/img/placeholder.jpg";
 let teamLogos = {};
 
 document.addEventListener("DOMContentLoaded", async () => {

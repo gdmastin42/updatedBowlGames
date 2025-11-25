@@ -86,15 +86,21 @@ function makeMatch(id, team1, team2) {
     return `
         <div class="team-card" data-match="${id}">
             
-            <label class="team-row">
+            <label class="team-row d-flex align-items-center">
                 <input type="radio" name="${id}" value="${team1}">
-                <img class="team-logo" src="${resolveLogo(team1)}">
+                <img src="${resolveLogo(team1)}" 
+                     alt="${team1} logo" 
+                     class="me-2"
+                     style="width: 50px; height: 50px;">
                 <span class="team1-label">${team1}</span>
             </label>
 
-            <label class="team-row">
+            <label class="team-row d-flex align-items-center">
                 <input type="radio" name="${id}" value="${team2}">
-                <img class="team-logo" src="${resolveLogo(team2)}">
+                <img src="${resolveLogo(team2)}" 
+                     alt="${team2} logo" 
+                     class="me-2"
+                     style="width: 50px; height: 50px;">
                 <span class="team2-label">${team2}</span>
             </label>
 
@@ -140,8 +146,12 @@ function updateNextRounds(matchID, winner) {
     const label = card.querySelector(`.${slot}-label`);
     const img = label.previousElementSibling;
 
-    label.textContent = winner;
     img.src = resolveLogo(winner);
+    img.style.width = "50px";
+    img.style.height = "50px";
+    img.classList.add("me-2");
+
+    label.textContent = winner;
 
     const radio = card.querySelector(`input[name='${next}'][value*='Winner']`);
     if (radio) radio.value = winner;

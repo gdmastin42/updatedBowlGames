@@ -3,6 +3,18 @@ const PLACEHOLDER_LOGO = "/img/placeholder.jpg";
 let teamLogos = {};
 
 document.addEventListener("DOMContentLoaded", async () => {
+    // Fill username
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+        const formatted = storedUsername.replace("_", " ");
+        const usernameElement = document.getElementById("txtUsername");
+        if (usernameElement) usernameElement.textContent = formatted;
+    } else {
+        // If no username found, return to login
+        window.location.href = "index.html";
+        return;
+    }
+
     teamLogos = await fetchTeamLogos();
     generateBracket();
     enableAutoAdvance();

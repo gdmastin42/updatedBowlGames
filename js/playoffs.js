@@ -153,10 +153,10 @@ function updateNextRounds(matchID, winner) {
     const label = card.querySelector(`.${slot}-label`);
     const img = label.previousElementSibling;
 
-    const realLogo = resolveLogo(winner);
+    const logo = resolveLogo(winner);
 
-    if (realLogo) {
-        img.src = realLogo;
+    if (logo) {
+        img.src = logo;
         img.style.display = "inline-block";
     } else {
         img.src = "";
@@ -165,7 +165,6 @@ function updateNextRounds(matchID, winner) {
 
     img.style.width = "50px";
     img.style.height = "50px";
-    img.classList.add("me-2");
 
     label.textContent = winner;
 

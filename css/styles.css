@@ -112,7 +112,7 @@ body.bg-dark {
     color: black !important;
 }
 .bracket-round {
-    border-left: 4px solid #0d6efd;
+    border-left: 4px solid #ffc107;
     padding-left: 15px;
     margin-bottom: 40px;
 }

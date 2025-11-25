@@ -123,7 +123,12 @@ function isPlaceholder(team) {
 }
 
 function resolveLogo(teamStr) {
-    const name = teamStr.substring(teamStr.indexOf(".") + 2);
+    // If teamStr starts with number "6. Georgia"
+    if (teamStr.includes(".")) {
+        teamStr = teamStr.substring(teamStr.indexOf(".") + 2);
+    }
+    // Trim to clean name
+    const name = teamStr.trim();
     return teamLogos[name] || "";
 }
 

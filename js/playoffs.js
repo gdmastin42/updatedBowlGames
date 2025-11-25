@@ -1,9 +1,9 @@
 const BASE_URL = '';
-const PLACEHOLDER_LOGO = "/img/placeholder.png"; // STEP 1: Placeholder logo
+const PLACEHOLDER_LOGO = "/img/placeholder.jpg";
 let teamLogos = {};
 
 document.addEventListener("DOMContentLoaded", async () => {
-    teamLogos = await fetchTeamLogos();  // LOAD LOGOS FIRST
+    teamLogos = await fetchTeamLogos();
     generateBracket();
     enableAutoAdvance();
 });
@@ -113,7 +113,6 @@ function isPlaceholder(team) {
 }
 
 function resolveLogo(teamStr) {
-    // Extract exact team name from "5. Florida State"
     const name = teamStr.substring(teamStr.indexOf(".") + 2);
     return teamLogos[name] || "";
 }

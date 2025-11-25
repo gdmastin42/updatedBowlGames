@@ -87,8 +87,17 @@ function makeMatch(id, team1, team2) {
     const cleanTeam1 = isPlaceholder(team1) ? "TBD" : team1;
     const cleanTeam2 = isPlaceholder(team2) ? "TBD" : team2;
 
-    const logo1 = isPlaceholder(team1) ? "" : `<img src="${resolveLogo(team1)}" class="me-2" style="width: 50px; height: 50px;">`;
-    const logo2 = isPlaceholder(team2) ? "" : `<img src="${resolveLogo(team2)}" class="me-2" style="width: 50px; height: 50px;">`;
+    const logo1 = `<img 
+        src="${isPlaceholder(team1) ? "" : resolveLogo(team1)}"
+        class="me-2 team1-img"
+        style="width: 50px; height: 50px; display:${isPlaceholder(team1) ? "none" : "inline-block"};"
+    >`;
+
+    const logo2 = `<img 
+        src="${isPlaceholder(team2) ? "" : resolveLogo(team2)}"
+        class="me-2 team2-img"
+        style="width: 50px; height: 50px; display:${isPlaceholder(team2) ? "none" : "inline-block"};"
+    >`;
 
     return `
         <div class="team-card" data-match="${id}">
@@ -152,13 +161,11 @@ function updateNextRounds(matchID, winner) {
 
     const logo = resolveLogo(winner);
 
-    if (!logo) {
-        if (img) img.style.display = "none";
+    if (logo) {
+        img.src = logo;
+        img.style.display = "inline-block";
     } else {
-        if (img) {
-            img.src = logo;
-            img.style.display = "inline-block";
-        }
+        img.style.display = "none";
     }
 
     label.textContent = winner;

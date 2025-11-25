@@ -183,6 +183,13 @@ function updateNextRounds(matchID, winner) {
     radios[index].value = winner;
 }
 
+function getMatchTeams(matchID) {
+    const card = document.querySelector(`[data-match='${matchID}']`);
+    const team1 = card.querySelector(".team1-label").textContent;
+    const team2 = card.querySelector(".team2-label").textContent;
+    return { team1, team2 };
+}
+
 document.getElementById("btnSubmitBracket").addEventListener("click", async () => {
     const userID = localStorage.getItem("userID");
 
@@ -193,8 +200,19 @@ document.getElementById("btnSubmitBracket").addEventListener("click", async () =
 
     const picks = [];
     document.querySelectorAll("input[type='radio']:checked").forEach(input => {
+        const matchID = input.name;
+        const { team1, team2 } = getMatchTeams(matchID);
+
+        let prefix = "";
+        if (matchID.startsWith("r1")) prefix = "r1";
+        else if (matchID.startsWith("r2")) prefix = "qf";
+        else if (matchID.startsWith("r3")) prefix = "sf";
+        else if (matchID.startsWith("r4")) prefix = "champ";
+
+        const readableName = `${prefix}-${team1} vs ${team2}`;
+
         picks.push({
-            gameName: input.name,
+            gameName: readableName,
             winner: input.value
         });
     });

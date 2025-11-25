@@ -1,5 +1,4 @@
 const BASE_URL = '';
-const PLACEHOLDER_LOGO = "/img/placeholder.jpg";
 let teamLogos = {};
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -92,19 +91,15 @@ function makeMatch(id, team1, team2) {
             
             <label class="team-row d-flex align-items-center">
                 <input type="radio" name="${id}" value="${cleanTeam1}">
-                <img 
-                    src="${isPlaceholder(team1) ? "" : resolveLogo(team1)}"
-                    class="me-2 team-logo"
-                    style="width: 50px; height: 50px; display: ${isPlaceholder(team1) ? "none" : "inline-block"};">
+                <img src="${isPlaceholder(team1) ? PLACEHOLDER_LOGO : resolveLogo(team1)}" 
+                    class="me-2" style="width: 50px; height: 50px;">
                 <span class="team1-label">${cleanTeam1}</span>
             </label>
 
             <label class="team-row d-flex align-items-center">
                 <input type="radio" name="${id}" value="${cleanTeam2}">
-                <img 
-                    src="${isPlaceholder(team2) ? "" : resolveLogo(team2)}"
-                    class="me-2 team-logo"
-                    style="width: 50px; height: 50px; display: ${isPlaceholder(team2) ? "none" : "inline-block"};">
+                <img src="${isPlaceholder(team2) ? PLACEHOLDER_LOGO : resolveLogo(team2)}" 
+                    class="me-2" style="width: 50px; height: 50px;">
                 <span class="team2-label">${cleanTeam2}</span>
             </label>
 
@@ -153,18 +148,10 @@ function updateNextRounds(matchID, winner) {
     const label = card.querySelector(`.${slot}-label`);
     const img = label.previousElementSibling;
 
-    const logo = resolveLogo(winner);
-
-    if (logo) {
-        img.src = logo;
-        img.style.display = "inline-block";
-    } else {
-        img.src = "";
-        img.style.display = "none";
-    }
-
+    img.src = resolveLogo(winner) || PLACEHOLDER_LOGO;
     img.style.width = "50px";
     img.style.height = "50px";
+    img.classList.add("me-2");
 
     label.textContent = winner;
 

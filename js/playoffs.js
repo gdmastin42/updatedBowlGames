@@ -177,9 +177,10 @@ function updateNextRounds(matchID, winner) {
     // Update label text
     label.textContent = winner;
 
-    // Update radio value
-    const radio = card.querySelector(`input[name='${next}'][value*='Winner']`);
-    if (radio) radio.value = winner;
+    // Update radio value by slot position
+    const radios = card.querySelectorAll(`input[name='${next}']`);
+    const index = slot === "team1" ? 0 : 1;
+    radios[index].value = winner;
 }
 
 document.getElementById("btnSubmitBracket").addEventListener("click", async () => {

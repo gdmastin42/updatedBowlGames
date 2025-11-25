@@ -157,10 +157,11 @@ function updateNextRounds(matchID, winner) {
 
     const card = document.querySelector(`[data-match='${next}']`);
     const label = card.querySelector(`.${slot}-label`);
-    const img = label.previousElementSibling;
+    const img = card.querySelector(`.${slot}-img`);
 
     const logo = resolveLogo(winner);
 
+    // Update logo correctly
     if (logo) {
         img.src = logo;
         img.style.display = "inline-block";
@@ -168,8 +169,10 @@ function updateNextRounds(matchID, winner) {
         img.style.display = "none";
     }
 
+    // Update label text
     label.textContent = winner;
 
+    // Update radio value
     const radio = card.querySelector(`input[name='${next}'][value*='Winner']`);
     if (radio) radio.value = winner;
 }

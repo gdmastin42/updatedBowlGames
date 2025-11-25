@@ -87,20 +87,21 @@ function makeMatch(id, team1, team2) {
     const cleanTeam1 = isPlaceholder(team1) ? "TBD" : team1;
     const cleanTeam2 = isPlaceholder(team2) ? "TBD" : team2;
 
+    const logo1 = isPlaceholder(team1) ? "" : `<img src="${resolveLogo(team1)}" class="me-2" style="width: 50px; height: 50px;">`;
+    const logo2 = isPlaceholder(team2) ? "" : `<img src="${resolveLogo(team2)}" class="me-2" style="width: 50px; height: 50px;">`;
+
     return `
         <div class="team-card" data-match="${id}">
             
             <label class="team-row d-flex align-items-center">
                 <input type="radio" name="${id}" value="${cleanTeam1}">
-                <img src="${isPlaceholder(team1) ? PLACEHOLDER_LOGO : resolveLogo(team1)}" 
-                    class="me-2" style="width: 50px; height: 50px;">
+                ${logo1}
                 <span class="team1-label">${cleanTeam1}</span>
             </label>
 
             <label class="team-row d-flex align-items-center">
                 <input type="radio" name="${id}" value="${cleanTeam2}">
-                <img src="${isPlaceholder(team2) ? PLACEHOLDER_LOGO : resolveLogo(team2)}" 
-                    class="me-2" style="width: 50px; height: 50px;">
+                ${logo2}
                 <span class="team2-label">${cleanTeam2}</span>
             </label>
 
@@ -149,10 +150,16 @@ function updateNextRounds(matchID, winner) {
     const label = card.querySelector(`.${slot}-label`);
     const img = label.previousElementSibling;
 
-    img.src = resolveLogo(winner) || PLACEHOLDER_LOGO;
-    img.style.width = "50px";
-    img.style.height = "50px";
-    img.classList.add("me-2");
+    const logo = resolveLogo(winner);
+
+    if (!logo) {
+        if (img) img.style.display = "none";
+    } else {
+        if (img) {
+            img.src = logo;
+            img.style.display = "inline-block";
+        }
+    }
 
     label.textContent = winner;
 

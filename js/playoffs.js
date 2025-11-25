@@ -193,7 +193,10 @@ document.getElementById("btnSubmitBracket").addEventListener("click", async () =
 
     const picks = [];
     document.querySelectorAll("input[type='radio']:checked").forEach(input => {
-        picks.push({ gameID: input.name, predictedWinner: input.value });
+        picks.push({
+            gameName: input.name,
+            winner: input.value
+        });
     });
 
     if (picks.length < 7) {
@@ -201,7 +204,7 @@ document.getElementById("btnSubmitBracket").addEventListener("click", async () =
         return;
     }
 
-    const response = await fetch(`${BASE_URL}/api/predictions`, {
+    const response = await fetch(`${BASE_URL}/api/playoffs`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userID, predictions: picks })

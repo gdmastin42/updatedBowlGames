@@ -57,26 +57,16 @@ const db = new sqlite3.Database('./database/bowlGames.db', (err) => {
                 FOREIGN KEY (gameID) REFERENCES tblBowlGames(gameID)
             )
         `)
+        db.run(`
+            CREATE TABLE IF NOT EXISTS tblPlayoffs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                userID TEXT NOT NULL,
+                gameName TEXT NOT NULL,
+                winner TEXT NOT NULL,
+                FOREIGN KEY (userID) REFERENCES tblUsers(userID)
+            )
+        `);
 
-        // db.all('SELECT * FROM tblBowlGames', (err, rows) => {
-        //     if (err) {
-        //         console.error('Error fetching games:', err.message)
-        //         return
-        //     }
-
-        //     rows.forEach((row) => {
-        //         const newGameID = uuidv4()
-        //         db.run(
-        //             'UPDATE tblBowlGames SET gameID = ? WHERE gameID = ?',
-        //             [newGameID, row.gameID],
-        //             (err) => {
-        //                 if (err) {
-        //                     console.error('Error updating gameID:', err.message)
-        //                 }
-        //             }
-        //         )
-        //     })
-        // })
 
         // Auto-load bowl games on server start (optional)
         axios.get('http://localhost:8000/api/fetch-bowl-games')
@@ -314,6 +304,60 @@ app.get('/api/gameResults', (req, res) => {
         res.json(results)
     })
 })
+app.post('/api/playoffs', (req, res) => {
+    const { userID, predictions } = req.body;
+
+    if (!userID || !predictions || !Array.isArray(predictions)) {
+        return res.status(400).json({ error: 'Invalid request format.' });
+    }
+
+    // Check if user already submitted playoff predictions
+    db.get(
+        'SELECT 1 FROM tblPlayoffs WHERE userID = ? LIMIT 1',
+        [userID],
+        (err, row) => {
+            if (err) {
+                return res.status(500).json({ error: 'Database error.' });
+            }
+
+            if (row) {
+                return res
+                    .status(409)
+                    .json({ error: 'You already submitted playoff predictions.' });
+            }
+
+            const insert = db.prepare(`
+                INSERT INTO tblPlayoffs (userID, gameName, winner)
+                VALUES (?, ?, ?)
+            `);
+
+            db.serialize(() => {
+                predictions.forEach(({ gameName, winner }) => {
+                    insert.run(
+                        userID,
+                        gameName,
+                        winner,
+                        (err) => {
+                            if (err) {
+                                console.error('Insert error:', err.message);
+                            }
+                        }
+                    );
+                });
+
+                insert.finalize((err) => {
+                    if (err) {
+                        return res.status(500).json({ error: 'Error finalizing inserts.' });
+                    }
+
+                    res.json({
+                        message: 'Playoff predictions submitted successfully.'
+                    });
+                });
+            });
+        }
+    );
+});
 
 // Route to fetch API key
 app.get('/api/key', (req, res) => {

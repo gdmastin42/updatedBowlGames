@@ -1,4 +1,5 @@
 const BASE_URL = '';
+const PLACEHOLDER_LOGO = "/img/placeholder.png"; // STEP 1: Placeholder logo
 let teamLogos = {};
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -83,29 +84,32 @@ function generateBracket() {
 }
 
 function makeMatch(id, team1, team2) {
+    const cleanTeam1 = isPlaceholder(team1) ? "TBD" : team1;
+    const cleanTeam2 = isPlaceholder(team2) ? "TBD" : team2;
+
     return `
         <div class="team-card" data-match="${id}">
             
             <label class="team-row d-flex align-items-center">
-                <input type="radio" name="${id}" value="${team1}">
-                <img src="${resolveLogo(team1)}" 
-                     alt="${team1} logo" 
-                     class="me-2"
-                     style="width: 50px; height: 50px;">
-                <span class="team1-label">${team1}</span>
+                <input type="radio" name="${id}" value="${cleanTeam1}">
+                <img src="${isPlaceholder(team1) ? PLACEHOLDER_LOGO : resolveLogo(team1)}" 
+                    class="me-2" style="width: 50px; height: 50px;">
+                <span class="team1-label">${cleanTeam1}</span>
             </label>
 
             <label class="team-row d-flex align-items-center">
-                <input type="radio" name="${id}" value="${team2}">
-                <img src="${resolveLogo(team2)}" 
-                     alt="${team2} logo" 
-                     class="me-2"
-                     style="width: 50px; height: 50px;">
-                <span class="team2-label">${team2}</span>
+                <input type="radio" name="${id}" value="${cleanTeam2}">
+                <img src="${isPlaceholder(team2) ? PLACEHOLDER_LOGO : resolveLogo(team2)}" 
+                    class="me-2" style="width: 50px; height: 50px;">
+                <span class="team2-label">${cleanTeam2}</span>
             </label>
 
         </div>
     `;
+}
+
+function isPlaceholder(team) {
+    return team.startsWith("Winner:");
 }
 
 function resolveLogo(teamStr) {
@@ -146,7 +150,7 @@ function updateNextRounds(matchID, winner) {
     const label = card.querySelector(`.${slot}-label`);
     const img = label.previousElementSibling;
 
-    img.src = resolveLogo(winner);
+    img.src = resolveLogo(winner) || PLACEHOLDER_LOGO;
     img.style.width = "50px";
     img.style.height = "50px";
     img.classList.add("me-2");

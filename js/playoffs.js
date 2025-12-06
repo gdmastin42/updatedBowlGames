@@ -47,18 +47,18 @@ function generateBracket() {
     const container = document.getElementById("bracketContainer");
 
     const teams = [
-        "1. Michigan",
-        "2. Washington",
-        "3. Texas",
-        "4. Alabama",
-        "5. Florida State",
-        "6. Georgia",
-        "7. Ohio State",
-        "8. Oregon",
-        "9. Penn State",
-        "10. Ole Miss",
-        "11. Missouri",
-        "12. Oklahoma"
+        "1. Ohio State",
+        "2. Indiana",
+        "3. Georgia",
+        "4. Texas Tech",
+        "5. Oregon",
+        "6. Ole Miss",
+        "7. Texas A&M",
+        "8. Oklahoma",
+        "9. Alabama",
+        "10. Miami",
+        "11. Virginia",
+        "12. Tulane"
     ];
 
     container.innerHTML = `

@@ -202,9 +202,9 @@ async function syncScoresFromAPI(db) {
         const { data } = await axios.get('https://api.collegefootballdata.com/games', {
             params: {
                 year: 2025,
-                seasonType: 'regular',
-                classification: 'fbs',
-                week: '13'
+                seasonType: 'postseason',
+                classification: 'fbs'
+                // week: '13'
             },
             headers: { Authorization: `Bearer ${apiKey}` }
         })
@@ -377,9 +377,8 @@ app.get('/api/fetch-bowl-games', async (req, res) => {
         const response = await axios.get('https://api.collegefootballdata.com/games', {
             params: {
                 year: 2025,
-                seasonType: 'regular',
-                classification: 'fbs',
-                week: 13
+                seasonType: 'postseason',
+                classification: 'fbs'
             },
             headers: {
                 Authorization: `Bearer ${apiKey}`

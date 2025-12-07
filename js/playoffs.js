@@ -153,16 +153,20 @@ function enableAutoAdvance() {
 }
 
 const nextMap = {
-    "r1-g1": { next: "r2-g1", slot: "team2" },
-    "r1-g2": { next: "r2-g2", slot: "team2" },
-    "r1-g3": { next: "r2-g3", slot: "team2" },
-    "r1-g4": { next: "r2-g4", slot: "team2" },
+    // Round 1 → Quarterfinals
+    "r1-g1": { next: "r2-g1", slot: "team2" },  // winner to #4 seed game
+    "r1-g2": { next: "r2-g2", slot: "team2" },  // winner to #3 seed game
+    "r1-g3": { next: "r2-g3", slot: "team2" },  // winner to #2 seed game
+    "r1-g4": { next: "r2-g4", slot: "team2" },  // winner to #1 seed game
 
-    "r2-g1": { next: "r3-g1", slot: "team1" },
-    "r2-g2": { next: "r3-g1", slot: "team2" },
-    "r2-g3": { next: "r3-g2", slot: "team1" },
-    "r2-g4": { next: "r3-g2", slot: "team2" },
+    // Quarterfinals → Semifinals
+    "r2-g1": { next: "r3-g1", slot: "team2" },  // #4 seed game → Semi 1
+    "r2-g4": { next: "r3-g1", slot: "team1" },  // #1 seed game → Semi 1
 
+    "r2-g2": { next: "r3-g2", slot: "team2" },  // #3 seed game → Semi 2
+    "r2-g3": { next: "r3-g2", slot: "team1" },  // #2 seed game → Semi 2
+
+    // Semifinals → Championship
     "r3-g1": { next: "r4-g1", slot: "team1" },
     "r3-g2": { next: "r4-g1", slot: "team2" }
 };

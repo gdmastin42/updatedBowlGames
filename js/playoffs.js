@@ -47,8 +47,8 @@ function generateBracket() {
     const container = document.getElementById("bracketContainer");
 
     const teams = [
-        "1. Ohio State",
-        "2. Indiana",
+        "1. Indiana",
+        "2. Ohio State",
         "3. Georgia",
         "4. Texas Tech",
         "5. Oregon",
@@ -57,8 +57,8 @@ function generateBracket() {
         "8. Oklahoma",
         "9. Alabama",
         "10. Miami",
-        "11. Virginia",
-        "12. Tulane"
+        "11. Tulane",
+        "12. James Madison"
     ];
 
     container.innerHTML = `

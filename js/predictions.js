@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function fetchTeamLogos() {
     try {
-        const keyResponse = await fetch(`${BASE_URL}/api/key`)
+        // const keyResponse = await fetch(`${BASE_URL}/api/key`)
         const { apiKey } = await keyResponse.json()
 
         const response = await fetch("https://apinext.collegefootballdata.com/teams/fbs", {

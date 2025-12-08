@@ -360,13 +360,13 @@ app.post('/api/playoffs', (req, res) => {
 });
 
 // Route to fetch API key
-app.get('/api/key', (req, res) => {
-    const apiKey = process.env.API_KEY // Ensure API_KEY is set in your .env file
-    if (!apiKey) {
-        return res.status(500).json({ error: 'API key not found.' })
-    }
-    res.json({ apiKey })
-})
+// app.get('/api/key', (req, res) => {
+//     const apiKey = process.env.API_KEY // Ensure API_KEY is set in your .env file
+//     if (!apiKey) {
+//         return res.status(500).json({ error: 'API key not found.' })
+//     }
+//     res.json({ apiKey })
+// })
 
 // Route to fetch and store last year's bowl games from CFBD
 app.get('/api/fetch-bowl-games', async (req, res) => {
@@ -403,12 +403,16 @@ app.get('/api/fetch-bowl-games', async (req, res) => {
 
             const gameName = `${game.awayTeam} at ${game.homeTeam}`;
 
+            // Detect playoff games
+            let type = 'regular';
+            if (game.notes && game.notes.includes('College Football Playoff')) type = 'playoff';
+            // You can also match by gameName or other logic if needed
             stmt.run(
                 uuidv4(),
                 gameName,
                 game.homeTeam, // team1 = home
                 game.awayTeam, // team2 = away
-                'regular',
+                type,
                 score
             );
         });
@@ -424,7 +428,7 @@ app.get('/api/fetch-bowl-games', async (req, res) => {
 
 // Route to fetch all bowl games
 app.get('/api/bowlGames', (req, res) => {
-    db.all('SELECT * FROM tblBowlGames', (err, rows) => {
+    db.all(`SELECT * FROM tblBowlGames WHERE type != 'playoff'`, (err, rows) => {
         if (err) {
             return res.status(500).json({ error: 'Database error.' })
         }

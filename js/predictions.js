@@ -254,26 +254,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function fetchTeamLogos() {
     try {
-        // const keyResponse = await fetch(`${BASE_URL}/api/key`)
-        const { apiKey } = await keyResponse.json()
-
-        const response = await fetch("https://apinext.collegefootballdata.com/teams/fbs", {
-            headers: {
-                "Authorization": `Bearer ${apiKey}`
-            }
-        })
-
-        if (!response.ok) throw new Error(`HTTP ${response.status}`)
-        const teams = await response.json()
-
-        const logos = {}
-        teams.forEach(team => {
-            logos[team.school] = team.logos?.[0] || ""
-        })
-        return logos
+        const response = await fetch(`${BASE_URL}/api/teamLogos`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return await response.json();
     } catch (err) {
-        console.error("Failed to fetch team logos:", err)
-        return {}
+        console.error("Failed to fetch team logos:", err);
+        return {};
     }
 }
 

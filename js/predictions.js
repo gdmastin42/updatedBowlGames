@@ -1,20 +1,21 @@
-    // Update Scores button handler
-    document.getElementById('btnUpdateScores')?.addEventListener('click', async (event) => {
-        event.preventDefault();
-        try {
-            const resp = await fetch(`${BASE_URL}/api/sync-scores`, { method: 'POST' });
-            const data = await resp.json();
-            if (resp.ok) {
-                Swal.fire('Success', data.message || 'Scores updated successfully.', 'success');
-            } else {
-                Swal.fire('Error', data.error || 'Failed to update scores.', 'error');
-            }
-        } catch (err) {
-            Swal.fire('Error', 'An error occurred while updating scores.', 'error');
-        }
-    });
 const BASE_URL = ''
 let currentChart = null
+
+// Update Scores button handler
+document.getElementById('btnUpdateScores')?.addEventListener('click', async (event) => {
+    event.preventDefault();
+    try {
+        const resp = await fetch(`${BASE_URL}/api/sync-scores`, { method: 'POST' });
+        const data = await resp.json();
+        if (resp.ok) {
+            Swal.fire('Success', data.message || 'Scores updated successfully.', 'success');
+        } else {
+            Swal.fire('Error', data.error || 'Failed to update scores.', 'error');
+        }
+    } catch (err) {
+        Swal.fire('Error', 'An error occurred while updating scores.', 'error');
+    }
+});
 
 document.addEventListener('DOMContentLoaded', async () => {
     const teamLogos = await fetchTeamLogos()
@@ -226,7 +227,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // On modal show, recalc DataTables Responsive for All Predictions
         const api = $.fn.DataTable.isDataTable('#allPredictionsTable') && $('#allPredictionsTable').DataTable();
         if (api) api.columns.adjust().responsive.recalc();
-        // ...existing code for other tables...
     });
     // On modal hide, remove resize handler
     $('#chartModal').on('hidden.bs.modal', function () {
@@ -254,26 +254,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function fetchTeamLogos() {
     try {
-        const keyResponse = await fetch(`${BASE_URL}/api/key`)
-        const { apiKey } = await keyResponse.json()
-
-        const response = await fetch("https://apinext.collegefootballdata.com/teams/fbs", {
-            headers: {
-                "Authorization": `Bearer ${apiKey}`
-            }
-        })
-
-        if (!response.ok) throw new Error(`HTTP ${response.status}`)
-        const teams = await response.json()
-
-        const logos = {}
-        teams.forEach(team => {
-            logos[team.school] = team.logos?.[0] || ""
-        })
-        return logos
+        const response = await fetch(`${BASE_URL}/api/teamLogos`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return await response.json();
     } catch (err) {
-        console.error("Failed to fetch team logos:", err)
-        return {}
+        console.error("Failed to fetch team logos:", err);
+        return {};
     }
 }
 
@@ -356,7 +342,7 @@ document.getElementById('frmPredictions')?.addEventListener('submit', (event) =>
     .then(res => res.json().then(data => ({ status: res.status, body: data })))
     .then(({ status, body }) => {
         if (status === 409) {
-            Swal.fire('Error', body.error, 'error'); // Already submitted
+            Swal.fire('Error', body.error, 'error');
         } else if (body.error) {
             Swal.fire('Error', body.error, 'error');
         } else {
